@@ -1,0 +1,12 @@
+{
+  "name": "lab01-first-app-checker",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "01418342 ปฏิบัติการที่ 1 - เครื่องมือตรวจงาน",
+  "scripts": {
+    "check-env": "node scripts/check-env.mjs",
+    "check": "node scripts/check-app.mjs"
+  },
+  "engines": { "node": ">=20" }
+}

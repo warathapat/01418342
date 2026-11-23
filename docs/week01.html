@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>01418342 สัปดาห์ 1</title>
+<meta name="description" content="ปฏิบัติการสัปดาห์ที่ 1 ของรายวิชา 01418342 — แอปแรกของฉัน รันบนอุปกรณ์จำลอง">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: หน้าเดียวต่อสัปดาห์ — หัวเรื่องติดบน แล้วไล่ลงเป็นบล็อก โดยบล็อก "ลองรันดู" เป็นแกนกลางของหน้า */
+:root{
+  --bg:#FBFAF7; --card:#FFFFFF; --ink:#16191D; --dim:#5C636E; --line:#DFDCD4;
+  --cyan:#0B7A96; --green:#1A7F37; --amber:#9A6412; --violet:#6B46C1;
+  --term-bg:#0D1117; --term-ink:#C9D1D9;
+  --font-ui:"IBM Plex Sans Thai",system-ui,"Segoe UI",sans-serif;
+  --font-mono:"IBM Plex Mono",ui-monospace,Consolas,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0D1117; --card:#161B22; --ink:#E6EDF3; --dim:#8B949E; --line:#263040;
+  --cyan:#61DAFB; --green:#3FB950; --amber:#F0A93B; --violet:#A371F7;
+  --term-bg:#010409; --term-ink:#C9D1D9; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0D1117; --card:#161B22; --ink:#E6EDF3; --dim:#8B949E; --line:#263040;
+  --cyan:#61DAFB; --green:#3FB950; --amber:#F0A93B; --violet:#A371F7;
+  --term-bg:#010409; --term-ink:#C9D1D9; color-scheme:dark}
+
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--font-ui);
+  font-size:16px;line-height:1.72;margin:0;-webkit-font-smoothing:antialiased}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);
+  z-index:10;background:var(--bg)}
+.wrap{max-width:62rem;margin:0 auto;
+  padding-left:max(16px,env(safe-area-inset-left,0px));
+  padding-right:max(16px,env(safe-area-inset-right,0px))}
+
+header.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:9;
+  background:var(--bg);border-bottom:1px solid var(--line)}
+header.top .wrap{display:flex;flex-wrap:wrap;align-items:baseline;gap:.4rem 1rem;padding-block:.7rem}
+.course{font-weight:700;letter-spacing:.01em}
+.course span{color:var(--cyan)}
+nav.weeks{display:flex;flex-wrap:wrap;gap:.3rem;margin-left:auto;min-width:0}
+nav.weeks a{font-family:var(--font-mono);font-size:.76rem;text-decoration:none;color:var(--dim);
+  border:1px solid var(--line);border-radius:4px;padding:.1rem .42rem}
+nav.weeks a[aria-current="page"]{color:var(--bg);background:var(--cyan);border-color:var(--cyan);font-weight:500}
+nav.weeks a:hover{color:var(--ink)}
+nav.weeks .soon{font-family:var(--font-mono);font-size:.76rem;color:var(--line);
+  border:1px solid var(--line);border-radius:4px;padding:.1rem .42rem}
+a.file{text-decoration:none;color:inherit;display:block}
+a.file:hover{border-color:var(--cyan)}
+
+main .wrap{padding-block:2rem 4rem;display:flex;flex-direction:column;gap:2.6rem}
+.eyebrow{font-family:var(--font-mono);font-size:.78rem;letter-spacing:.09em;
+  text-transform:uppercase;color:var(--dim);margin:0 0 .3rem}
+h1{font-size:clamp(1.6rem,4.6vw,2.3rem);line-height:1.28;margin:0 0 .6rem;
+  font-weight:700;text-wrap:balance;letter-spacing:-.01em}
+h2{font-size:1.18rem;margin:0 0 .7rem;font-weight:600;text-wrap:balance}
+h2 .num{font-family:var(--font-mono);color:var(--cyan);font-size:.95rem;margin-right:.5rem}
+p{margin:0 0 .8rem;max-width:63ch}
+p:last-child{margin-bottom:0}
+.lede{font-size:1.02rem;color:var(--dim);max-width:64ch}
+code{font-family:var(--font-mono);font-size:.88em;
+  background:color-mix(in srgb,var(--cyan) 12%,transparent);
+  padding:.08em .34em;border-radius:3px}
+
+section{border-top:1px solid var(--line);padding-top:1.5rem}
+section:first-of-type{border-top:0;padding-top:0}
+
+ul.goals{list-style:none;padding:0;margin:0;display:grid;gap:.5rem}
+ul.goals li{display:flex;gap:.6rem;align-items:flex-start}
+ul.goals li::before{content:"";flex:none;width:.52rem;height:.52rem;margin-top:.6rem;
+  border-radius:2px;background:var(--cyan)}
+
+/* ลองรันดู */
+.runner{display:grid;gap:1rem}
+.snip{background:var(--card);border:1px solid var(--line);border-radius:8px;overflow:hidden}
+.snip > h3{margin:0;font-size:.94rem;font-weight:600;padding:.7rem .9rem;
+  border-bottom:1px solid var(--line);display:flex;gap:.6rem;align-items:baseline}
+.snip > h3 .tag{font-family:var(--font-mono);font-size:.72rem;color:var(--amber);
+  letter-spacing:.06em;text-transform:uppercase;flex:none}
+.snip textarea{width:100%;border:0;resize:vertical;display:block;min-height:10.6rem;
+  font-family:var(--font-mono);font-size:.84rem;line-height:1.66;
+  padding:.8rem .9rem;background:transparent;color:var(--ink)}
+.snip textarea:focus{outline:2px solid var(--cyan);outline-offset:-2px}
+.bar{display:flex;flex-wrap:wrap;gap:.6rem;align-items:center;
+  padding:.6rem .9rem;border-top:1px solid var(--line)}
+button{font-family:var(--font-ui);font-size:.86rem;font-weight:600;cursor:pointer;
+  border-radius:5px;padding:.34rem .85rem;border:1px solid var(--cyan);
+  background:var(--cyan);color:var(--bg)}
+button.ghost{background:transparent;color:var(--dim);border-color:var(--line)}
+button:hover{filter:brightness(1.08)}
+button:focus-visible{outline:2px solid var(--amber);outline-offset:2px}
+.hint{font-size:.8rem;color:var(--dim);margin-left:auto;min-width:0}
+.out{font-family:var(--font-mono);font-size:.82rem;line-height:1.7;white-space:pre-wrap;
+  word-break:break-word;background:var(--term-bg);color:var(--term-ink);
+  padding:.8rem .9rem;margin:0;overflow-x:auto;border-top:1px solid var(--line)}
+.out .ok{color:var(--green)}
+.out .bad{color:#FF7B72}
+.out .note{color:#7D8590}
+
+.term{background:var(--term-bg);color:var(--term-ink);border-radius:8px;
+  font-family:var(--font-mono);font-size:.82rem;line-height:1.85;
+  padding:1rem 1.1rem;overflow-x:auto;border:1px solid var(--line);
+  white-space:pre-wrap;word-break:break-word}
+.term .ok{color:var(--green)}
+.term .bad{color:#FF7B72}
+.term .c{color:#7D8590}
+
+table{border-collapse:collapse;width:100%;font-size:.92rem}
+.scroller{overflow-x:auto;min-width:0}
+th,td{text-align:left;vertical-align:top;padding:.56rem .7rem;border:1px solid var(--line)}
+th{background:color-mix(in srgb,var(--cyan) 9%,transparent);font-weight:600;font-size:.86rem}
+
+.files{display:grid;gap:.6rem;grid-template-columns:repeat(auto-fit,minmax(16rem,1fr))}
+.file{background:var(--card);border:1px solid var(--line);border-radius:7px;padding:.8rem .9rem}
+.file .name{font-family:var(--font-mono);font-size:.84rem;color:var(--cyan);
+  word-break:break-all;display:block;margin-bottom:.2rem}
+.file .what{font-size:.86rem;color:var(--dim)}
+
+.callout{border-left:3px solid var(--amber);
+  background:color-mix(in srgb,var(--amber) 10%,transparent);
+  padding:.8rem 1rem;border-radius:0 6px 6px 0}
+.callout strong{color:var(--amber)}
+footer{border-top:1px solid var(--line);margin-top:1rem;padding-top:1.2rem;
+  font-size:.84rem;color:var(--dim)}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="wrap">
+    <div class="course">01418342 <span>การพัฒนาแอปบนอุปกรณ์เคลื่อนที่</span></div>
+    <nav class="weeks" aria-label="สัปดาห์">
+      <a href="index.html" title="หน้ารวม">ดัชนี</a>
+      <a href="week01.html" aria-current="page">1</a><a href="week02.html">2</a>
+      <span class="soon">3</span><span class="soon">4</span><span class="soon">5</span>
+      <span class="soon">6</span><span class="soon">7</span><span class="soon">8</span>
+      <span class="soon">9</span><span class="soon">10</span><span class="soon">11</span>
+      <span class="soon">12</span><span class="soon">13</span><span class="soon">14</span>
+      <span class="soon">15</span>
+    </nav>
+  </div>
+</header>
+
+<main>
+<div class="wrap">
+
+  <section>
+    <p class="eyebrow">สัปดาห์ 1 · ภาคปลาย 2569</p>
+    <h1>แอปแรกของฉัน รันบนอุปกรณ์จำลอง</h1>
+    <p class="lede">จบคาบนี้ทุกคนต้องมีแอปของตัวเองรันอยู่จริงหนึ่งตัว ไม่ใช่เพราะแอปนั้นมีประโยชน์อะไร แต่เพราะแล็บอีกสิบสี่สัปดาห์ที่เหลือเริ่มจากจุดนี้ทั้งหมด</p>
+  </section>
+
+  <section>
+    <h2><span class="num">01</span>จบสัปดาห์นี้ต้องทำอะไรได้</h2>
+    <ul class="goals">
+      <li>สร้างโปรเจกต์ Expo ใหม่จากศูนย์ และเปิดให้รันบนอุปกรณ์จำลองของ Android Studio ได้ด้วยตัวเอง</li>
+      <li>แก้ข้อความบนหน้าจอแล้วเห็นผลเปลี่ยนทันทีโดยไม่ต้องปิดเปิดแอปใหม่</li>
+      <li>บอกความต่างระหว่างการพัฒนาแบบเนทีฟ ไฮบริด และข้ามแพลตฟอร์มได้</li>
+      <li>แก้ปัญหาเครื่องเบื้องต้นได้เอง เมื่อ <code>npm</code> เรียกไม่ได้หรืออุปกรณ์จำลองไม่บูต</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2><span class="num">02</span>ก่อนเริ่ม ตรวจเครื่องก่อน</h2>
+    <p>ดาวน์โหลดชุดเครื่องมือด้านล่าง แตกไฟล์ไว้ที่ไดรฟ์ D แล้วดับเบิลคลิก <code>1-CHECK-PC.bat</code> ต้องผ่านครบ 6 ข้อก่อนทำขั้นต่อไป ข้อที่ไม่ผ่านตัวโปรแกรมจะบอกวิธีแก้ให้เอง</p>
+    <div class="term" role="img" aria-label="ตัวอย่างผลการตรวจความพร้อมของเครื่อง">
+<span class="c">D:\mobile\lab01-first-app&gt;</span> npm run check-env
+
+  ปฏิบัติการที่ 1  —  ตรวจความพร้อมของเครื่อง
+
+  <span class="ok">✓</span> Node.js เวอร์ชัน 22.11.0
+  <span class="ok">✓</span> npm เวอร์ชัน 10.9.0
+  <span class="ok">✓</span> พบ Java
+  <span class="ok">✓</span> พบ Android SDK
+  <span class="ok">✓</span> เรียก adb ได้
+  <span class="bad">✗</span> ยังไม่มี AVD
+      ทางแก้: เปิด Android Studio ไปที่ Device Manager แล้วสร้างอุปกรณ์จำลองเป็นมือถือ เช่น Pixel 7
+
+  ผ่าน 5 จาก 6 ข้อ</div>
+  </section>
+
+  <section>
+    <h2><span class="num">03</span>ขั้นตอน</h2>
+    <p>เปิดอุปกรณ์จำลองค้างไว้ก่อน แล้วค่อยรัน <code>npm run android</code> ครั้งแรกจะใช้เวลาหลายนาที ระหว่างรอห้ามปิดหน้าต่าง</p>
+    <div class="term" role="img" aria-label="คำสั่งสำหรับสร้างและรันโปรเจกต์">
+<span class="c">รันทีละบรรทัดใน Command Prompt ไม่ใช่ PowerShell</span>
+D:
+cd D:\mobile
+npx create-expo-app@latest my-first-app --template blank
+cd my-first-app
+npm run android
+code .                       <span class="c"># เปิด VS Code ที่โฟลเดอร์นี้</span></div>
+    <p style="margin-top:1rem">เมื่อแอปขึ้นแล้ว เปิดไฟล์หน้าจอแรกใน VS Code แก้ข้อความ แล้วกดบันทึก ให้มองที่อุปกรณ์จำลอง ข้อความจะเปลี่ยนเองภายในไม่กี่วินาที ไม่ต้องสั่งอะไรเพิ่ม</p>
+  </section>
+
+  <section>
+    <h2><span class="num">04</span>ปฏิบัติการประจำสัปดาห์</h2>
+    <p>แก้หน้าจอแรกให้ครบสามอย่าง แล้วดับเบิลคลิก <code>2-CHECK-WORK.bat</code> เพื่อดูว่าผ่านหรือยัง</p>
+    <div class="scroller">
+      <table>
+        <thead><tr><th scope="col">ข้อ</th><th scope="col">สิ่งที่ต้องทำ</th></tr></thead>
+        <tbody>
+          <tr><td>1</td><td>แสดงรหัสนิสิตสิบหลักของตัวเองบนหน้าจอ</td></tr>
+          <tr><td>2</td><td>ลบประโยคตัวอย่างที่ Expo ใส่มาให้ออกให้หมด แล้วเขียนข้อความของตัวเองแทน</td></tr>
+          <tr><td>3</td><td>จับภาพหน้าจอตอนแอปรันอยู่ บันทึกชื่อ <code>screenshot.png</code> ไว้ในโฟลเดอร์โปรเจกต์</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p style="margin-top:1rem">ดาวน์โหลดไฟล์ของสัปดาห์นี้ และส่งงานที่ Google Classroom หัวข้อ <strong>ปฏิบัติการที่ 1</strong></p>
+    <div class="files">
+      <a class="file" href="files/lab01-first-app.zip" download><span class="name">lab01-first-app.zip</span><span class="what">ชุดเครื่องมือตรวจงาน ไม่ใช่ตัวโปรเจกต์ โปรเจกต์ให้สร้างเอง</span></a>
+      <a class="file" href="files/01418342-lab01-sheet.pdf"><span class="name">01418342-lab01-sheet.pdf</span><span class="what">ใบแล็บหนึ่งหน้า สิ่งที่ต้องส่ง และเกณฑ์คะแนน</span></a>
+    </div>
+  </section>
+
+  <section>
+    <h2><span class="num">05</span>ถ้าติด ให้ดูตรงนี้</h2>
+    <div class="scroller">
+      <table>
+        <thead><tr><th scope="col">อาการที่เห็น</th><th scope="col">ให้ย้อนไปดูตรงไหน</th></tr></thead>
+        <tbody>
+          <tr><td><code>npm</code> บอกว่าสคริปต์ถูกปิดไว้</td><td>หน้าต่างที่เปิดอยู่เป็น PowerShell หรือ Command Prompt</td></tr>
+          <tr><td>แอปขึ้นแต่แก้ข้อความแล้วหน้าจอไม่เปลี่ยน</td><td>ไฟล์ที่กำลังแก้ใช่ไฟล์หน้าจอแรกของโปรเจกต์นี้หรือเปล่า และบันทึกแล้วหรือยัง</td></tr>
+          <tr><td>อุปกรณ์จำลองค้างที่โลโก้ Android ไม่ไปไหน</td><td>ตัวเร่งความเร็วของอุปกรณ์จำลองถูกเปิดไว้หรือยัง</td></tr>
+          <tr><td>ตัวตรวจงานบอกว่าหาโปรเจกต์ไม่เจอ</td><td>โฟลเดอร์ <code>lab01-first-app</code> วางอยู่ข้าง ๆ โปรเจกต์หรือเปล่า</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="callout" style="margin-top:1.1rem">
+      <strong>เก็บงานไว้ที่ไดรฟ์ D หรือ OneDrive</strong> ไม่ใช่ Desktop เพราะเครื่องในห้องบางตัวล้างโปรไฟล์ผู้ใช้ทุกครั้งที่ออกจากระบบ
+    </div>
+  </section>
+
+  <footer>
+    01418342 การออกแบบและพัฒนาโปรแกรมประยุกต์สำหรับอุปกรณ์เคลื่อนที่ · ภาควิชาวิทยาการคำนวณและเทคโนโลยีดิจิทัล คณะศิลปศาสตร์และวิทยาศาสตร์ มหาวิทยาลัยเกษตรศาสตร์ วิทยาเขตกำแพงแสน · ผู้สอน อ.ดร.วรัทภพ ธภัทรสุวรรณ
+  </footer>
+
+</div>
+</main>
+
+<style>.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}</style>
+
+<script>
+(function () {
+  var original = {};
+  ['s1','s2','s3','s4'].forEach(function (id) {
+    var el = document.getElementById(id);
+    if (el) original[id] = el.value;
+  });
+
+  function show(v) {
+    if (typeof v === 'string') return v;
+    if (v === undefined) return 'undefined';
+    if (v === null) return 'null';
+    if (Array.isArray(v)) return '[' + v.map(show).join(', ') + ']';
+    if (typeof v === 'object') {
+      try { return JSON.stringify(v); } catch (e) { return String(v); }
+    }
+    return String(v);
+  }
+
+  function esc(s) {
+    return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  }
+
+  function run(id) {
+    var src = document.getElementById(id).value;
+    var out = document.getElementById('o' + id.slice(1));
+    var lines = [];
+    var fake = {
+      log: function () {
+        lines.push(Array.prototype.map.call(arguments, show).join(' '));
+      }
+    };
+    fake.info = fake.warn = fake.error = fake.log;
+    try {
+      new Function('console', '"use strict";\n' + src)(fake);
+      out.innerHTML = lines.length
+        ? lines.map(function (l) { return '<span class="ok">▸</span> ' + esc(l); }).join('\n')
+        : '<span class="note">รันผ่านแล้ว แต่ไม่มี console.log ให้แสดง</span>';
+    } catch (e) {
+      out.innerHTML = lines.map(function (l) { return '<span class="ok">▸</span> ' + esc(l); })
+        .concat('<span class="bad">✗ ' + esc(e.name + ': ' + e.message) + '</span>').join('\n');
+    }
+  }
+
+  document.addEventListener('click', function (ev) {
+    var b = ev.target.closest('button');
+    if (!b) return;
+    if (b.dataset.run) run(b.dataset.run);
+    if (b.dataset.reset) {
+      var id = b.dataset.reset;
+      document.getElementById(id).value = original[id];
+      document.getElementById('o' + id.slice(1)).innerHTML =
+        '<span class="note">กดปุ่มรันเพื่อดูผล</span>';
+    }
+  });
+})();
+</script>
+</body>
+</html>

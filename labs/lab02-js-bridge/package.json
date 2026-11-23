@@ -1,0 +1,11 @@
+{
+  "name": "lab02-js-bridge",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "01418342 ปฏิบัติการที่ 2 - JavaScript สำหรับผู้ที่มาจาก C และ Java",
+  "scripts": {
+    "check": "node scripts/check.mjs"
+  },
+  "engines": { "node": ">=20" }
+}
