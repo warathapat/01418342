@@ -1,0 +1,439 @@
+# -*- coding: utf-8 -*-
+# สร้าง docs/index.html หน้าดัชนีรายวิชา 01418342 แนวเว็บเรียนออนไลน์
+# ออกมาเป็น HTML สถิตล้วน แก้ด้วยมือต่อได้ กลไกเปิดปิดสัปดาห์ยังเป็นคำว่า soon คำเดียว
+import io, os
+os.chdir(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..'))
+
+TEACHER = 'อ.ดร.วรัทภพ ธภัทรสุวรรณ'
+
+# คำค้นเพิ่มเติมต่อสัปดาห์ ไม่แสดงบนหน้า ใช้ให้ค้นด้วยชื่อเทคโนโลยีเจอ
+KW = {1: 'expo emulator android studio create-expo-app vscode ติดตั้ง', 2: 'javascript js array const reference equality', 3: 'async await promise asynchronous fetch รอ', 4: 'component view text flexbox layout styling', 5: 'navigation router stack tabs expo-router หน้าจอ', 6: 'state usestate useeffect hook lifecycle', 7: 'form validation input ทบทวน review', 8: 'fetch api rest http json network เครือข่าย', 9: 'sql database schema erd normalization ออกแบบ', 10: 'sqlite expo-sqlite local database offline', 11: 'cloud backend supabase firebase api server', 12: 'map gps location geolocation maps แผนที่ พิกัด', 13: 'camera sensor accelerometer gesture กล้อง', 14: 'media audio video push notification แจ้งเตือน', 15: 'eas build web responsive deploy apk'}
+
+# (เลขสัปดาห์, ไฟล์, ชื่อหัวข้อ, ตัวอักษรบนปก, สีปก, หมวด, สื่อที่มีแล้ว, เปิดหรือยัง)
+WEEKS = [
+  (1,  'week01.html', 'แอปแรกของฉัน รันบนอุปกรณ์จำลอง',            'EXPO',   'g', 'พื้นฐาน',        ['ใบแล็บ','โปรเจกต์ตั้งต้น'], True),
+  (2,  'week02.html', 'JavaScript สำหรับผู้ที่มาจาก C และ Java',    'JS',     'a', 'พื้นฐาน',        ['สไลด์','ใบแล็บ','โปรเจกต์ตั้งต้น','กล่องทดลอง'], False),
+  (3,  'week03.html', 'การทำงานแบบอะซิงโครนัส Promise และ async/await', 'ASYNC', 'v', 'พื้นฐาน',    [], False),
+  (4,  'week04.html', 'คอมโพเนนต์หลักและการจัดวาง UI',              'UI',     'c', 'ส่วนต่อประสาน', [], False),
+  (5,  'week05.html', 'ส่วนต่อประสานผู้ใช้และระบบนำทาง',            'NAV',    'c', 'ส่วนต่อประสาน', [], False),
+  (6,  'week06.html', 'สถานะและวงจรชีวิตของคอมโพเนนต์',             'STATE',  'v', 'ส่วนต่อประสาน', [], False),
+  (7,  'week07.html', 'แบบฟอร์ม การตรวจความถูกต้อง และทบทวน',       'FORM',   'c', 'ส่วนต่อประสาน', [], False),
+  (8,  'week08.html', 'การเชื่อมต่อเครือข่าย Fetch API และ REST',   'HTTP',   'a', 'ข้อมูล',        [], False),
+  (9,  'week09.html', 'ออกแบบฐานข้อมูลและ SQL ที่รันได้',           'SQL',    'g', 'ข้อมูล',        [], False),
+  (10, 'week10.html', 'ฐานข้อมูลในเครื่องด้วย expo-sqlite',         'SQLITE', 'g', 'ข้อมูล',        [], False),
+  (11, 'week11.html', 'ฐานข้อมูลบนคลาวด์และการเชื่อมต่อแบ็กเอนด์',  'CLOUD',  'c', 'ข้อมูล',        [], False),
+  (12, 'week12.html', 'ตำแหน่งทางภูมิศาสตร์และแผนที่',              'MAP',    'g', 'อุปกรณ์',       [], False),
+  (13, 'week13.html', 'อากัปกิริยา ตัวรับรู้ และกล้อง',             'SENSOR', 'a', 'อุปกรณ์',       [], False),
+  (14, 'week14.html', 'สื่อประสมและการแจ้งเตือนแบบพุช',             'MEDIA',  'v', 'อุปกรณ์',       [], False),
+  (15, 'week15.html', 'เว็บบนมือถือ ข้อจำกัดอุปกรณ์ และ EAS Build', 'BUILD',  'a', 'อุปกรณ์',       [], False),
+]
+
+EXAMS = [
+  ('mid',   'สอบกลางภาค',  'ภาคปฏิบัติ 3 ชั่วโมง ครอบคลุมสัปดาห์ 1–7', 'MID',   7),
+  ('final', 'สอบปลายภาค',  'ภาคปฏิบัติ 3 ชั่วโมง เน้นสัปดาห์ 8–15',    'FINAL', 15),
+]
+
+CATS = ['ทั้งหมด', 'พื้นฐาน', 'ส่วนต่อประสาน', 'ข้อมูล', 'อุปกรณ์', 'สอบ']
+STACK = ['React Native', 'Expo SDK 57', 'JavaScript', 'expo-sqlite', 'REST API',
+         'Android Studio', 'VS Code', 'Git']
+
+
+def card(w):
+    n, href, title, ico, tint, cat, mats, ready = w
+    soon = '' if ready else ' soon'
+    mat = ''.join('<span class="mat">%s</span>' % m for m in mats) or \
+          '<span class="mat none">ยังไม่ได้ทำสื่อ</span>'
+    return '''
+      <article class="wk%(soon)s" data-cat="%(cat)s" data-find="สัปดาห์ %(n)d %(title)s %(ico)s %(cat)s %(kw)s">
+        <div class="cover t-%(tint)s"><span>%(ico)s</span></div>
+        <div class="body">
+          <p class="n">สัปดาห์ที่ %(n)d<span class="pill ready">เปิดแล้ว</span><span class="pill soon">ยังไม่เปิด</span></p>
+          <h3 class="t">%(title)s</h3>
+          <p class="by">%(teacher)s</p>
+          <p class="mats">%(mat)s</p>
+          <p class="foot"><span class="go">เข้าเรียน</span><span class="later">เปิดในคาบสัปดาห์ที่ %(n)d</span><button type="button" class="done" data-done="w%(n)d">เรียนแล้ว</button></p>
+        </div>
+        <a class="hit" href="%(href)s" aria-label="เข้าเรียนสัปดาห์ที่ %(n)d %(title)s"></a>
+      </article>''' % dict(soon=soon, cat=cat, n=n, title=title, ico=ico, tint=tint,
+                          teacher=TEACHER, mat=mat, href=href, kw=KW.get(n, ''))
+
+
+def exam(e):
+    key, name, desc, ico, after = e
+    return '''
+      <article class="wk soon ex" data-cat="สอบ" data-find="%(name)s %(desc)s สอบ">
+        <div class="cover t-x"><span>%(ico)s</span></div>
+        <div class="body">
+          <p class="n">%(name)s<span class="pill exam">ภาคปฏิบัติ</span></p>
+          <h3 class="t">%(desc)s</h3>
+          <p class="by">%(teacher)s</p>
+          <p class="mats"><span class="mat none">ไม่มีสื่อเผยแพร่</span></p>
+          <p class="foot"><span class="go dim">ดูรายละเอียดที่ Google Classroom</span></p>
+        </div>
+      </article>''' % dict(name=name, desc=desc, ico=ico, teacher=TEACHER)
+
+
+# เรียงการ์ดตามลำดับจริงของภาคการศึกษา สอบกลางภาคคั่นหลังสัปดาห์ 7
+cards = []
+for w in WEEKS:
+    cards.append(card(w))
+    if w[0] == 7:
+        cards.append(exam(EXAMS[0]))
+cards.append(exam(EXAMS[1]))
+
+html = '''<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>01418342 การพัฒนาแอปบนอุปกรณ์เคลื่อนที่</title>
+<meta name="description" content="สื่อการสอนรายวิชา 01418342 ภาคปลาย 2569 — React Native และ Expo">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* หน้าดัชนีรายวิชา จัดแบบเว็บเรียนออนไลน์
+   แถบบนค้างไว้ > ค้นหาและกรองหมวด > การ์ดรายสัปดาห์
+   เปิดหรือปิดสัปดาห์ไหน แก้คำว่า soon ใน class ของการ์ดนั้นคำเดียว */
+:root{
+  --bg:#FBFAF7; --card:#FFFFFF; --ink:#16191D; --dim:#5C636E; --line:#DFDCD4;
+  --cyan:#0B7A96; --green:#1A7F37; --amber:#9A6412; --violet:#6B46C1;
+  --shadow:0 1px 2px rgba(0,0,0,.05),0 6px 16px -10px rgba(0,0,0,.22);
+  --cover:#11161D;
+  --font-ui:"IBM Plex Sans Thai",system-ui,"Segoe UI",sans-serif;
+  --font-mono:"IBM Plex Mono",ui-monospace,Consolas,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0D1117; --card:#161B22; --ink:#E6EDF3; --dim:#8B949E; --line:#263040;
+  --cyan:#61DAFB; --green:#3FB950; --amber:#F0A93B; --violet:#A371F7;
+  --shadow:0 1px 2px rgba(0,0,0,.4),0 8px 20px -12px rgba(0,0,0,.8);
+  --cover:#090D13; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0D1117; --card:#161B22; --ink:#E6EDF3; --dim:#8B949E; --line:#263040;
+  --cyan:#61DAFB; --green:#3FB950; --amber:#F0A93B; --violet:#A371F7;
+  --shadow:0 1px 2px rgba(0,0,0,.4),0 8px 20px -12px rgba(0,0,0,.8);
+  --cover:#090D13; color-scheme:dark}
+
+*{box-sizing:border-box}
+/* ต้องมีบรรทัดนี้ ไม่งั้น display:flex ของการ์ดจะทับ hidden
+   แล้วการค้นหากับการกรองหมวดจะซ่อนการ์ดไม่ได้ */
+[hidden]{display:none!important}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font-ui);
+  font-size:16px;line-height:1.7;-webkit-font-smoothing:antialiased}
+img{max-width:100%}
+.wrap{max-width:74rem;margin:0 auto;
+  padding-left:max(16px,env(safe-area-inset-left,0px));
+  padding-right:max(16px,env(safe-area-inset-right,0px))}
+
+/* ---------- แถบบน ---------- */
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:var(--card);
+  border-bottom:1px solid var(--line)}
+.top .wrap{display:flex;gap:1rem;align-items:center;padding-block:.65rem;flex-wrap:wrap}
+.brand{display:flex;gap:.55rem;align-items:baseline;text-decoration:none;color:inherit;flex:none}
+.brand b{font-family:var(--font-mono);font-size:1.02rem;font-weight:600;color:var(--cyan)}
+.brand span{font-size:.9rem;color:var(--dim)}
+.find{flex:1 1 14rem;min-width:0;position:relative}
+.find input{width:100%;font:inherit;font-size:.92rem;color:var(--ink);background:var(--bg);
+  border:1px solid var(--line);border-radius:999px;padding:.42rem .9rem .42rem 2.2rem}
+.find input:focus{outline:2px solid var(--cyan);outline-offset:-1px}
+.find svg{position:absolute;left:.75rem;top:50%;transform:translateY(-50%);
+  width:1rem;height:1rem;stroke:var(--dim);fill:none;stroke-width:2}
+.count{flex:none;font-size:.85rem;color:var(--dim)}
+.count b{color:var(--ink);font-weight:600}
+
+/* ---------- หมวด ---------- */
+.cats{border-bottom:1px solid var(--line);background:var(--bg)}
+.cats .wrap{display:flex;gap:.45rem;padding-block:.55rem;overflow-x:auto;
+  scrollbar-width:thin}
+.cat{font:inherit;font-size:.86rem;font-weight:500;white-space:nowrap;cursor:pointer;
+  background:transparent;color:var(--dim);border:1px solid transparent;
+  border-radius:999px;padding:.22rem .8rem}
+.cat:hover{color:var(--ink);background:var(--card)}
+.cat[aria-pressed="true"]{color:var(--bg);background:var(--ink);border-color:var(--ink)}
+.cat:focus-visible{outline:2px solid var(--cyan);outline-offset:2px}
+
+/* ---------- หัวเรื่อง ---------- */
+header .wrap{padding-block:2.4rem 1.8rem;border-bottom:1px solid var(--line)}
+.eyebrow{font-family:var(--font-mono);font-size:.8rem;letter-spacing:.1em;
+  text-transform:uppercase;color:var(--cyan);margin:0 0 .5rem}
+h1{font-size:clamp(1.65rem,4.2vw,2.3rem);line-height:1.26;margin:0 0 .7rem;
+  font-weight:700;letter-spacing:-.01em;text-wrap:balance;max-width:24ch}
+.sub{color:var(--dim);margin:0;max-width:62ch}
+.meta{display:flex;flex-wrap:wrap;gap:.3rem 1.5rem;margin:1.1rem 0 0;padding:0;
+  list-style:none;font-size:.9rem;color:var(--dim)}
+.meta b{color:var(--ink);font-weight:600}
+.cta{display:inline-block;margin-top:1.4rem;text-decoration:none;font-weight:600;
+  font-size:.93rem;background:var(--cyan);color:var(--card);
+  border-radius:6px;padding:.5rem 1.3rem}
+.cta:hover{filter:brightness(1.08)}
+.stack{display:flex;flex-wrap:wrap;gap:.4rem;margin:1.5rem 0 0;padding:0;list-style:none}
+.stack li{font-family:var(--font-mono);font-size:.76rem;color:var(--dim);
+  border:1px solid var(--line);border-radius:4px;padding:.1rem .5rem}
+
+/* ---------- ตารางการ์ด ---------- */
+main .wrap{padding-block:2rem 4rem;display:flex;flex-direction:column;gap:2.2rem}
+h2{font-size:1.18rem;margin:0 0 .3rem;font-weight:600}
+.lede{margin:0 0 1.1rem;color:var(--dim);font-size:.92rem}
+.grid{display:grid;gap:1.1rem;grid-template-columns:repeat(auto-fill,minmax(16rem,1fr))}
+
+.wk{position:relative;display:flex;flex-direction:column;min-width:0;
+  background:var(--card);border:1px solid var(--line);border-radius:10px;
+  overflow:hidden;transition:transform .12s,box-shadow .12s,border-color .12s}
+.wk:not(.soon):hover{transform:translateY(-2px);box-shadow:var(--shadow);border-color:var(--cyan)}
+.hit{position:absolute;inset:0;z-index:1}
+.hit:focus-visible{outline:2px solid var(--cyan);outline-offset:-3px;border-radius:10px}
+
+.cover{aspect-ratio:16/9;background:var(--cover);display:grid;place-items:center;
+  border-bottom:1px solid var(--line);position:relative;overflow:hidden}
+.cover::before{content:"";position:absolute;inset:0;opacity:.5;
+  background-image:linear-gradient(var(--c) 1px,transparent 1px),
+    linear-gradient(90deg,var(--c) 1px,transparent 1px);
+  background-size:18px 18px;
+  -webkit-mask-image:radial-gradient(circle at 50% 50%,#000,transparent 72%);
+  mask-image:radial-gradient(circle at 50% 50%,#000,transparent 72%)}
+.cover span{position:relative;font-family:var(--font-mono);font-weight:600;
+  font-size:clamp(1.1rem,3.4vw,1.5rem);letter-spacing:.14em;color:var(--c)}
+.t-g{--c:#3FB950}
+.t-c{--c:#61DAFB}
+.t-a{--c:#F0A93B}
+.t-v{--c:#A371F7}
+.t-x{--c:#8B949E}
+
+.body{padding:.85rem 1rem 1rem;display:flex;flex-direction:column;gap:.2rem;flex:1}
+.wk .n{font-family:var(--font-mono);font-size:.75rem;color:var(--dim);margin:0;
+  display:flex;gap:.5rem;align-items:center;flex-wrap:wrap}
+.wk .t{font-size:.98rem;font-weight:600;line-height:1.42;margin:.1rem 0 0}
+.by{margin:.15rem 0 0;font-size:.8rem;color:var(--dim)}
+.mats{margin:.5rem 0 0;display:flex;flex-wrap:wrap;gap:.3rem}
+.mat{font-size:.7rem;color:var(--dim);border:1px solid var(--line);
+  border-radius:3px;padding:.02rem .4rem}
+.mat.none{border-style:dashed}
+.foot{margin:.8rem 0 0;padding-top:.7rem;border-top:1px solid var(--line);
+  display:flex;gap:.6rem;align-items:center;justify-content:space-between}
+.go{font-size:.86rem;font-weight:600;color:var(--cyan)}
+.go.dim{font-weight:400;color:var(--dim);font-size:.78rem}
+.done{position:relative;z-index:2;font:inherit;font-size:.76rem;cursor:pointer;
+  background:transparent;color:var(--dim);border:1px solid var(--line);
+  border-radius:999px;padding:.1rem .6rem;flex:none}
+.done:hover{color:var(--ink);border-color:var(--dim)}
+.done[aria-pressed="true"]{color:var(--green);
+  border-color:color-mix(in srgb,var(--green) 50%,transparent);
+  background:color-mix(in srgb,var(--green) 10%,transparent)}
+.done[aria-pressed="true"]::before{content:"\\2713\\A0"}
+.done:focus-visible{outline:2px solid var(--cyan);outline-offset:2px}
+
+.pill{font-size:.68rem;font-weight:600;letter-spacing:.03em;border-radius:3px;
+  padding:.02rem .4rem;flex:none}
+.pill.ready{color:var(--green);border:1px solid color-mix(in srgb,var(--green) 45%,transparent)}
+.pill.soon{color:var(--dim);border:1px solid var(--line)}
+.pill.exam{color:var(--amber);border:1px solid color-mix(in srgb,var(--amber) 45%,transparent)}
+
+/* ปิดสัปดาห์: ปกเป็นขาวดำ ตัวอักษรจาง ขอบประ กดไม่ได้ และสลับป้ายสถานะ
+   ไม่ใช้ opacity ทั้งใบ เพราะปกสีเข้มจะจมไปกับพื้นหลังจนดูเหมือนรูปเสีย */
+.wk.soon{border-style:dashed}
+.wk.soon .cover{filter:grayscale(1)}
+.wk.soon .cover span{opacity:.75}
+.wk.soon .t{color:var(--dim);font-weight:500}
+.wk.soon .hit{display:none}
+.wk.soon .go{display:none}
+.wk .pill.soon{display:none}
+.wk.soon .pill.ready{display:none}
+.wk.soon .pill.soon{display:inline}
+.wk.soon .done{display:none}
+.wk .later{display:none}
+.wk.soon .later{display:inline;font-size:.78rem;color:var(--dim)}
+.wk.ex .cover{filter:grayscale(1) brightness(.9)}
+
+.empty{color:var(--dim);font-size:.92rem;padding:1.5rem 0}
+
+.note{border-left:3px solid var(--cyan);
+  background:color-mix(in srgb,var(--cyan) 9%,transparent);
+  padding:.9rem 1.1rem;border-radius:0 6px 6px 0}
+.note p{margin:0;max-width:64ch}
+.note p + p{margin-top:.5rem}
+code{font-family:var(--font-mono);font-size:.88em;
+  background:color-mix(in srgb,var(--cyan) 13%,transparent);padding:.08em .34em;border-radius:3px}
+footer{border-top:1px solid var(--line)}
+footer .wrap{padding-block:1.4rem 2.4rem;font-size:.85rem;color:var(--dim)}
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;
+  clip:rect(0,0,0,0);white-space:nowrap;border:0}
+</style>
+</head>
+<body>
+
+<div class="top">
+  <div class="wrap">
+    <a class="brand" href="index.html"><b>01418342</b><span>การพัฒนาแอปบนอุปกรณ์เคลื่อนที่</span></a>
+    <div class="find">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
+      <label class="sr-only" for="q">ค้นหาหัวข้อ</label>
+      <input id="q" type="search" placeholder="ค้นหาหัวข้อ เช่น sqlite แผนที่ async" autocomplete="off">
+    </div>
+    <p class="count" id="count"></p>
+  </div>
+</div>
+
+<div class="cats">
+  <div class="wrap" id="cats">
+@@CATS@@
+  </div>
+</div>
+
+<header>
+  <div class="wrap">
+    <p class="eyebrow">ภาคปลาย ปีการศึกษา 2569</p>
+    <h1>การออกแบบและพัฒนาโปรแกรมประยุกต์สำหรับอุปกรณ์เคลื่อนที่</h1>
+    <p class="sub">เรียนเขียนแอปบนมือถือด้วย React Native และ Expo ตั้งแต่ติดตั้งเครื่องมือจนถึงแอปที่เก็บข้อมูลเองได้ ทุกสัปดาห์มีโปรเจกต์ตั้งต้นพร้อมตัวตรวจงานที่รันเองได้ทันที</p>
+    <ul class="meta">
+      <li>ผู้สอน <b>@@TEACHER@@</b></li>
+      <li>หมู่ <b>700 · 711 · 800</b></li>
+      <li>ห้อง <b>SC9-330</b></li>
+      <li>หน่วยกิต <b>3 (2-2-5)</b></li>
+    </ul>
+    <a class="cta" id="cta" href="week01.html">เริ่มเรียนสัปดาห์ที่ 1</a>
+    <ul class="stack">
+@@STACK@@
+    </ul>
+  </div>
+</header>
+
+<main>
+<div class="wrap">
+
+  <section>
+    <h2>แผนการสอน 15 สัปดาห์</h2>
+    <p class="lede">สัปดาห์ที่ยังไม่เปิดจะเป็นขาวดำและกดไม่ได้ เปิดตามคาบเรียนจริง</p>
+    <div class="grid" id="grid">
+@@CARDS@@
+    </div>
+    <p class="empty" id="empty" hidden>ไม่พบหัวข้อที่ค้นหา ลองคำอื่นหรือกดหมวดทั้งหมด</p>
+  </section>
+
+  <section>
+    <h2>วิธีใช้สื่อในเว็บนี้</h2>
+    <div class="note">
+      <p>ทุกสัปดาห์มีโปรเจกต์ตั้งต้นพร้อมตัวตรวจงาน สั่ง <code>npm run check</code> แล้วจะเห็นทันทีว่าข้อไหนผ่าน ข้อไหนยังไม่ผ่าน <strong>ชื่อของแต่ละเทสต์คือโจทย์ของข้อนั้น</strong> รันซ้ำได้ไม่จำกัดครั้ง คะแนนคิดจากจำนวนข้อที่ผ่านตอนปิดส่ง</p>
+      <p>เก็บงานไว้ที่ไดรฟ์ D หรือ OneDrive ไม่ใช่ Desktop เพราะเครื่องในห้องบางตัวล้างโปรไฟล์ผู้ใช้ทุกครั้งที่ออกจากระบบ และถ้า <code>npm</code> บอกว่าสคริปต์ถูกปิดไว้ ให้เปลี่ยนจาก PowerShell ไปใช้ Command Prompt</p>
+      <p>ปุ่ม <strong>เรียนแล้ว</strong> บนการ์ดเป็นเครื่องหมายของตัวเอง เก็บไว้ในเบราว์เซอร์เครื่องนั้น ไม่ได้ส่งไปที่ไหนและไม่เกี่ยวกับคะแนน การส่งงานและคะแนนทั้งหมดอยู่ที่ Google Classroom</p>
+    </div>
+  </section>
+
+</div>
+</main>
+
+<footer>
+  <div class="wrap">
+    ภาควิชาวิทยาการคำนวณและเทคโนโลยีดิจิทัล คณะศิลปศาสตร์และวิทยาศาสตร์ มหาวิทยาลัยเกษตรศาสตร์ วิทยาเขตกำแพงแสน
+  </div>
+</footer>
+
+<script>
+(function () {
+  var grid  = document.getElementById('grid');
+  var cards = Array.prototype.slice.call(grid.querySelectorAll('.wk'));
+  var q     = document.getElementById('q');
+  var empty = document.getElementById('empty');
+  var countEl = document.getElementById('count');
+  var cat   = 'ทั้งหมด';
+
+  // ---- ปุ่มเริ่มเรียน ชี้ไปที่สัปดาห์แรกที่เปิดอยู่จริง ----
+  // อ่านจากคลาส soon ของการ์ด จึงไม่ต้องมาแก้ลิงก์นี้ซ้ำตอนเปิดสัปดาห์ใหม่
+  (function () {
+    var open = cards.filter(function (c) {
+      return !c.classList.contains('soon') && c.querySelector('.hit');
+    });
+    var cta = document.getElementById('cta');
+    var last = open[open.length - 1];
+    if (!last) { cta.hidden = true; return; }
+    var a = last.querySelector('.hit');
+    var n = last.querySelector('.n').textContent.replace(/[^0-9]/g, '');
+    cta.href = a.getAttribute('href');
+    cta.textContent = open.length > 1
+      ? 'เรียนต่อที่สัปดาห์ที่ ' + n
+      : 'เริ่มเรียนสัปดาห์ที่ ' + n;
+  })();
+
+  // ---- ค้นหาและกรองหมวด ----
+  function apply() {
+    var needle = q.value.trim().toLowerCase();
+    var shown = 0;
+    cards.forEach(function (c) {
+      var okCat = cat === 'ทั้งหมด' || c.dataset.cat === cat;
+      var okFind = !needle ||
+        (c.dataset.find + ' ' + c.querySelector('.t').textContent).toLowerCase().indexOf(needle) > -1;
+      var show = okCat && okFind;
+      c.hidden = !show;
+      if (show) shown++;
+    });
+    empty.hidden = shown > 0;
+  }
+
+  q.addEventListener('input', apply);
+
+  document.getElementById('cats').addEventListener('click', function (ev) {
+    var b = ev.target.closest('.cat');
+    if (!b) return;
+    cat = b.dataset.cat;
+    Array.prototype.forEach.call(this.querySelectorAll('.cat'), function (x) {
+      x.setAttribute('aria-pressed', String(x === b));
+    });
+    apply();
+  });
+
+  // ---- เครื่องหมายเรียนแล้ว เก็บในเบราว์เซอร์เครื่องนั้น ----
+  var KEY = 'w342done';
+
+  function load() {
+    try { return JSON.parse(window.localStorage.getItem(KEY) || '{}') || {}; }
+    catch (e) { return {}; }
+  }
+  function save(o) {
+    try { window.localStorage.setItem(KEY, JSON.stringify(o)); } catch (e) {}
+  }
+
+  var done = load();
+  var buttons = Array.prototype.slice.call(grid.querySelectorAll('.done'));
+
+  function tally() {
+    var open = cards.filter(function (c) { return !c.classList.contains('soon') && !c.classList.contains('ex'); }).length;
+    var n = buttons.filter(function (b) {
+      return !b.closest('.wk').classList.contains('soon') && done[b.dataset.done];
+    }).length;
+    countEl.innerHTML = open
+      ? 'เรียนแล้ว <b>' + n + '</b> จาก ' + open + ' สัปดาห์ที่เปิด'
+      : '';
+  }
+
+  buttons.forEach(function (b) {
+    b.setAttribute('aria-pressed', String(!!done[b.dataset.done]));
+    b.addEventListener('click', function () {
+      done[b.dataset.done] = !done[b.dataset.done];
+      if (!done[b.dataset.done]) delete done[b.dataset.done];
+      b.setAttribute('aria-pressed', String(!!done[b.dataset.done]));
+      save(done);
+      tally();
+    });
+  });
+
+  tally();
+  apply();
+})();
+</script>
+
+</body>
+</html>
+'''
+cat_html = '\n'.join(
+    '    <button type="button" class="cat" data-cat="%s"%s>%s</button>'
+    % (c, ' aria-pressed="true"' if c == 'ทั้งหมด' else '', c) for c in CATS)
+stack_html = '\n'.join('      <li>%s</li>' % s for s in STACK)
+
+html = (html
+        .replace('@@TEACHER@@', TEACHER)
+        .replace('@@CATS@@', cat_html)
+        .replace('@@STACK@@', stack_html)
+        .replace('@@CARDS@@', ''.join(cards)))
+
+for token in ('@@TEACHER@@', '@@CATS@@', '@@STACK@@', '@@CARDS@@'):
+    assert token not in html, 'ยังมีตัวคั่นค้างอยู่ ' + token
+
+io.open('docs/index.html', 'w', encoding='utf-8').write(html)
+print('เขียน docs/index.html แล้ว %d ตัวอักษร  การ์ด %d ใบ' % (len(html), len(cards)))

@@ -7,81 +7,219 @@
 <meta name="description" content="สื่อการสอนรายวิชา 01418342 ภาคปลาย 2569 — React Native และ Expo">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
 <style>
-/* Layout: หน้าดัชนี — หัวเรื่อง แล้วตาราง 15 สัปดาห์เป็นการ์ด สัปดาห์ที่ยังไม่มีสื่อจะจางลง */
+/* หน้าดัชนีรายวิชา จัดแบบเว็บเรียนออนไลน์
+   แถบบนค้างไว้ > ค้นหาและกรองหมวด > การ์ดรายสัปดาห์
+   เปิดหรือปิดสัปดาห์ไหน แก้คำว่า soon ใน class ของการ์ดนั้นคำเดียว */
 :root{
   --bg:#FBFAF7; --card:#FFFFFF; --ink:#16191D; --dim:#5C636E; --line:#DFDCD4;
-  --cyan:#0B7A96; --green:#1A7F37; --amber:#9A6412;
+  --cyan:#0B7A96; --green:#1A7F37; --amber:#9A6412; --violet:#6B46C1;
+  --shadow:0 1px 2px rgba(0,0,0,.05),0 6px 16px -10px rgba(0,0,0,.22);
+  --cover:#11161D;
   --font-ui:"IBM Plex Sans Thai",system-ui,"Segoe UI",sans-serif;
   --font-mono:"IBM Plex Mono",ui-monospace,Consolas,monospace;
 }
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
   --bg:#0D1117; --card:#161B22; --ink:#E6EDF3; --dim:#8B949E; --line:#263040;
-  --cyan:#61DAFB; --green:#3FB950; --amber:#F0A93B; color-scheme:dark}}
+  --cyan:#61DAFB; --green:#3FB950; --amber:#F0A93B; --violet:#A371F7;
+  --shadow:0 1px 2px rgba(0,0,0,.4),0 8px 20px -12px rgba(0,0,0,.8);
+  --cover:#090D13; color-scheme:dark}}
 :root[data-theme="dark"]{
   --bg:#0D1117; --card:#161B22; --ink:#E6EDF3; --dim:#8B949E; --line:#263040;
-  --cyan:#61DAFB; --green:#3FB950; --amber:#F0A93B; color-scheme:dark}
+  --cyan:#61DAFB; --green:#3FB950; --amber:#F0A93B; --violet:#A371F7;
+  --shadow:0 1px 2px rgba(0,0,0,.4),0 8px 20px -12px rgba(0,0,0,.8);
+  --cover:#090D13; color-scheme:dark}
 
 *{box-sizing:border-box}
+/* ต้องมีบรรทัดนี้ ไม่งั้น display:flex ของการ์ดจะทับ hidden
+   แล้วการค้นหากับการกรองหมวดจะซ่อนการ์ดไม่ได้ */
+[hidden]{display:none!important}
 body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font-ui);
   font-size:16px;line-height:1.7;-webkit-font-smoothing:antialiased}
 img{max-width:100%}
-.wrap{max-width:62rem;margin:0 auto;
+.wrap{max-width:74rem;margin:0 auto;
   padding-left:max(16px,env(safe-area-inset-left,0px));
   padding-right:max(16px,env(safe-area-inset-right,0px))}
 
-header{border-bottom:1px solid var(--line)}
-header .wrap{padding-block:2.6rem 2rem}
+/* ---------- แถบบน ---------- */
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:var(--card);
+  border-bottom:1px solid var(--line)}
+.top .wrap{display:flex;gap:1rem;align-items:center;padding-block:.65rem;flex-wrap:wrap}
+.brand{display:flex;gap:.55rem;align-items:baseline;text-decoration:none;color:inherit;flex:none}
+.brand b{font-family:var(--font-mono);font-size:1.02rem;font-weight:600;color:var(--cyan)}
+.brand span{font-size:.9rem;color:var(--dim)}
+.find{flex:1 1 14rem;min-width:0;position:relative}
+.find input{width:100%;font:inherit;font-size:.92rem;color:var(--ink);background:var(--bg);
+  border:1px solid var(--line);border-radius:999px;padding:.42rem .9rem .42rem 2.2rem}
+.find input:focus{outline:2px solid var(--cyan);outline-offset:-1px}
+.find svg{position:absolute;left:.75rem;top:50%;transform:translateY(-50%);
+  width:1rem;height:1rem;stroke:var(--dim);fill:none;stroke-width:2}
+.count{flex:none;font-size:.85rem;color:var(--dim)}
+.count b{color:var(--ink);font-weight:600}
+
+/* ---------- หมวด ---------- */
+.cats{border-bottom:1px solid var(--line);background:var(--bg)}
+.cats .wrap{display:flex;gap:.45rem;padding-block:.55rem;overflow-x:auto;
+  scrollbar-width:thin}
+.cat{font:inherit;font-size:.86rem;font-weight:500;white-space:nowrap;cursor:pointer;
+  background:transparent;color:var(--dim);border:1px solid transparent;
+  border-radius:999px;padding:.22rem .8rem}
+.cat:hover{color:var(--ink);background:var(--card)}
+.cat[aria-pressed="true"]{color:var(--bg);background:var(--ink);border-color:var(--ink)}
+.cat:focus-visible{outline:2px solid var(--cyan);outline-offset:2px}
+
+/* ---------- หัวเรื่อง ---------- */
+header .wrap{padding-block:2.4rem 1.8rem;border-bottom:1px solid var(--line)}
 .eyebrow{font-family:var(--font-mono);font-size:.8rem;letter-spacing:.1em;
   text-transform:uppercase;color:var(--cyan);margin:0 0 .5rem}
-h1{font-size:clamp(1.7rem,4.4vw,2.4rem);line-height:1.26;margin:0 0 .7rem;
-  font-weight:700;letter-spacing:-.01em;text-wrap:balance}
-.sub{color:var(--dim);margin:0;max-width:60ch}
-.meta{display:flex;flex-wrap:wrap;gap:.4rem 1.6rem;margin:1.2rem 0 0;
-  padding:0;list-style:none;font-size:.9rem;color:var(--dim)}
+h1{font-size:clamp(1.65rem,4.2vw,2.3rem);line-height:1.26;margin:0 0 .7rem;
+  font-weight:700;letter-spacing:-.01em;text-wrap:balance;max-width:24ch}
+.sub{color:var(--dim);margin:0;max-width:62ch}
+.meta{display:flex;flex-wrap:wrap;gap:.3rem 1.5rem;margin:1.1rem 0 0;padding:0;
+  list-style:none;font-size:.9rem;color:var(--dim)}
 .meta b{color:var(--ink);font-weight:600}
+.cta{display:inline-block;margin-top:1.4rem;text-decoration:none;font-weight:600;
+  font-size:.93rem;background:var(--cyan);color:var(--card);
+  border-radius:6px;padding:.5rem 1.3rem}
+.cta:hover{filter:brightness(1.08)}
+.stack{display:flex;flex-wrap:wrap;gap:.4rem;margin:1.5rem 0 0;padding:0;list-style:none}
+.stack li{font-family:var(--font-mono);font-size:.76rem;color:var(--dim);
+  border:1px solid var(--line);border-radius:4px;padding:.1rem .5rem}
 
-main .wrap{padding-block:2.4rem 4rem;display:flex;flex-direction:column;gap:2.4rem}
-h2{font-size:1.2rem;margin:0 0 1rem;font-weight:600}
-.weeks{display:grid;gap:.7rem;grid-template-columns:repeat(auto-fill,minmax(17rem,1fr))}
-.wk{display:block;text-decoration:none;color:inherit;background:var(--card);
-  border:1px solid var(--line);border-radius:8px;padding:.85rem 1rem;min-width:0}
-a.wk:hover{border-color:var(--cyan)}
-.wk .n{font-family:var(--font-mono);font-size:.76rem;color:var(--dim);
-  display:flex;justify-content:space-between;gap:.6rem;align-items:baseline}
-.wk .t{font-weight:600;font-size:.97rem;line-height:1.45;margin-top:.15rem}
-/* เปิด/ปิดสัปดาห์: ใส่หรือเอาคำว่า soon ออกจาก class ของการ์ดนั้น คำเดียวจบ */
-.wk.soon{opacity:.5;pointer-events:none;cursor:default}
-.wk .pill.soon{display:none}
-.wk.soon .pill.ready{display:none}
-.wk.soon .pill.soon{display:inline}
-.pill{font-family:var(--font-ui);font-size:.68rem;font-weight:600;letter-spacing:.03em;
-  border-radius:3px;padding:.05rem .4rem;flex:none}
+/* ---------- ตารางการ์ด ---------- */
+main .wrap{padding-block:2rem 4rem;display:flex;flex-direction:column;gap:2.2rem}
+h2{font-size:1.18rem;margin:0 0 .3rem;font-weight:600}
+.lede{margin:0 0 1.1rem;color:var(--dim);font-size:.92rem}
+.grid{display:grid;gap:1.1rem;grid-template-columns:repeat(auto-fill,minmax(16rem,1fr))}
+
+.wk{position:relative;display:flex;flex-direction:column;min-width:0;
+  background:var(--card);border:1px solid var(--line);border-radius:10px;
+  overflow:hidden;transition:transform .12s,box-shadow .12s,border-color .12s}
+.wk:not(.soon):hover{transform:translateY(-2px);box-shadow:var(--shadow);border-color:var(--cyan)}
+.hit{position:absolute;inset:0;z-index:1}
+.hit:focus-visible{outline:2px solid var(--cyan);outline-offset:-3px;border-radius:10px}
+
+.cover{aspect-ratio:16/9;background:var(--cover);display:grid;place-items:center;
+  border-bottom:1px solid var(--line);position:relative;overflow:hidden}
+.cover::before{content:"";position:absolute;inset:0;opacity:.5;
+  background-image:linear-gradient(var(--c) 1px,transparent 1px),
+    linear-gradient(90deg,var(--c) 1px,transparent 1px);
+  background-size:18px 18px;
+  -webkit-mask-image:radial-gradient(circle at 50% 50%,#000,transparent 72%);
+  mask-image:radial-gradient(circle at 50% 50%,#000,transparent 72%)}
+.cover span{position:relative;font-family:var(--font-mono);font-weight:600;
+  font-size:clamp(1.1rem,3.4vw,1.5rem);letter-spacing:.14em;color:var(--c)}
+.t-g{--c:#3FB950}
+.t-c{--c:#61DAFB}
+.t-a{--c:#F0A93B}
+.t-v{--c:#A371F7}
+.t-x{--c:#8B949E}
+
+.body{padding:.85rem 1rem 1rem;display:flex;flex-direction:column;gap:.2rem;flex:1}
+.wk .n{font-family:var(--font-mono);font-size:.75rem;color:var(--dim);margin:0;
+  display:flex;gap:.5rem;align-items:center;flex-wrap:wrap}
+.wk .t{font-size:.98rem;font-weight:600;line-height:1.42;margin:.1rem 0 0}
+.by{margin:.15rem 0 0;font-size:.8rem;color:var(--dim)}
+.mats{margin:.5rem 0 0;display:flex;flex-wrap:wrap;gap:.3rem}
+.mat{font-size:.7rem;color:var(--dim);border:1px solid var(--line);
+  border-radius:3px;padding:.02rem .4rem}
+.mat.none{border-style:dashed}
+.foot{margin:.8rem 0 0;padding-top:.7rem;border-top:1px solid var(--line);
+  display:flex;gap:.6rem;align-items:center;justify-content:space-between}
+.go{font-size:.86rem;font-weight:600;color:var(--cyan)}
+.go.dim{font-weight:400;color:var(--dim);font-size:.78rem}
+.done{position:relative;z-index:2;font:inherit;font-size:.76rem;cursor:pointer;
+  background:transparent;color:var(--dim);border:1px solid var(--line);
+  border-radius:999px;padding:.1rem .6rem;flex:none}
+.done:hover{color:var(--ink);border-color:var(--dim)}
+.done[aria-pressed="true"]{color:var(--green);
+  border-color:color-mix(in srgb,var(--green) 50%,transparent);
+  background:color-mix(in srgb,var(--green) 10%,transparent)}
+.done[aria-pressed="true"]::before{content:"\2713\A0"}
+.done:focus-visible{outline:2px solid var(--cyan);outline-offset:2px}
+
+.pill{font-size:.68rem;font-weight:600;letter-spacing:.03em;border-radius:3px;
+  padding:.02rem .4rem;flex:none}
 .pill.ready{color:var(--green);border:1px solid color-mix(in srgb,var(--green) 45%,transparent)}
 .pill.soon{color:var(--dim);border:1px solid var(--line)}
 .pill.exam{color:var(--amber);border:1px solid color-mix(in srgb,var(--amber) 45%,transparent)}
 
+/* ปิดสัปดาห์: ปกเป็นขาวดำ ตัวอักษรจาง ขอบประ กดไม่ได้ และสลับป้ายสถานะ
+   ไม่ใช้ opacity ทั้งใบ เพราะปกสีเข้มจะจมไปกับพื้นหลังจนดูเหมือนรูปเสีย */
+.wk.soon{border-style:dashed}
+.wk.soon .cover{filter:grayscale(1)}
+.wk.soon .cover span{opacity:.75}
+.wk.soon .t{color:var(--dim);font-weight:500}
+.wk.soon .hit{display:none}
+.wk.soon .go{display:none}
+.wk .pill.soon{display:none}
+.wk.soon .pill.ready{display:none}
+.wk.soon .pill.soon{display:inline}
+.wk.soon .done{display:none}
+.wk .later{display:none}
+.wk.soon .later{display:inline;font-size:.78rem;color:var(--dim)}
+.wk.ex .cover{filter:grayscale(1) brightness(.9)}
+
+.empty{color:var(--dim);font-size:.92rem;padding:1.5rem 0}
+
 .note{border-left:3px solid var(--cyan);
   background:color-mix(in srgb,var(--cyan) 9%,transparent);
   padding:.9rem 1.1rem;border-radius:0 6px 6px 0}
-.note p{margin:0;max-width:62ch}
+.note p{margin:0;max-width:64ch}
 .note p + p{margin-top:.5rem}
 code{font-family:var(--font-mono);font-size:.88em;
   background:color-mix(in srgb,var(--cyan) 13%,transparent);padding:.08em .34em;border-radius:3px}
 footer{border-top:1px solid var(--line)}
 footer .wrap{padding-block:1.4rem 2.4rem;font-size:.85rem;color:var(--dim)}
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;
+  clip:rect(0,0,0,0);white-space:nowrap;border:0}
 </style>
 </head>
 <body>
 
+<div class="top">
+  <div class="wrap">
+    <a class="brand" href="index.html"><b>01418342</b><span>การพัฒนาแอปบนอุปกรณ์เคลื่อนที่</span></a>
+    <div class="find">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
+      <label class="sr-only" for="q">ค้นหาหัวข้อ</label>
+      <input id="q" type="search" placeholder="ค้นหาหัวข้อ เช่น sqlite แผนที่ async" autocomplete="off">
+    </div>
+    <p class="count" id="count"></p>
+  </div>
+</div>
+
+<div class="cats">
+  <div class="wrap" id="cats">
+    <button type="button" class="cat" data-cat="ทั้งหมด" aria-pressed="true">ทั้งหมด</button>
+    <button type="button" class="cat" data-cat="พื้นฐาน">พื้นฐาน</button>
+    <button type="button" class="cat" data-cat="ส่วนต่อประสาน">ส่วนต่อประสาน</button>
+    <button type="button" class="cat" data-cat="ข้อมูล">ข้อมูล</button>
+    <button type="button" class="cat" data-cat="อุปกรณ์">อุปกรณ์</button>
+    <button type="button" class="cat" data-cat="สอบ">สอบ</button>
+  </div>
+</div>
+
 <header>
   <div class="wrap">
-    <p class="eyebrow">01418342 · ภาคปลาย 2569</p>
+    <p class="eyebrow">ภาคปลาย ปีการศึกษา 2569</p>
     <h1>การออกแบบและพัฒนาโปรแกรมประยุกต์สำหรับอุปกรณ์เคลื่อนที่</h1>
-    <p class="sub">React Native และ Expo · หน้านี้รวมสไลด์ ใบปฏิบัติการ และโปรเจกต์ตั้งต้นของทุกสัปดาห์ การส่งงานและคะแนนอยู่ที่ Google Classroom</p>
+    <p class="sub">เรียนเขียนแอปบนมือถือด้วย React Native และ Expo ตั้งแต่ติดตั้งเครื่องมือจนถึงแอปที่เก็บข้อมูลเองได้ ทุกสัปดาห์มีโปรเจกต์ตั้งต้นพร้อมตัวตรวจงานที่รันเองได้ทันที</p>
     <ul class="meta">
       <li>ผู้สอน <b>อ.ดร.วรัทภพ ธภัทรสุวรรณ</b></li>
       <li>หมู่ <b>700 · 711 · 800</b></li>
       <li>ห้อง <b>SC9-330</b></li>
+      <li>หน่วยกิต <b>3 (2-2-5)</b></li>
+    </ul>
+    <a class="cta" id="cta" href="week01.html">เริ่มเรียนสัปดาห์ที่ 1</a>
+    <ul class="stack">
+      <li>React Native</li>
+      <li>Expo SDK 57</li>
+      <li>JavaScript</li>
+      <li>expo-sqlite</li>
+      <li>REST API</li>
+      <li>Android Studio</li>
+      <li>VS Code</li>
+      <li>Git</li>
     </ul>
   </div>
 </header>
@@ -91,93 +229,196 @@ footer .wrap{padding-block:1.4rem 2.4rem;font-size:.85rem;color:var(--dim)}
 
   <section>
     <h2>แผนการสอน 15 สัปดาห์</h2>
-    <div class="weeks">
+    <p class="lede">สัปดาห์ที่ยังไม่เปิดจะเป็นขาวดำและกดไม่ได้ เปิดตามคาบเรียนจริง</p>
+    <div class="grid" id="grid">
 
-      <a class="wk" href="week01.html">
-        <span class="n">สัปดาห์ 1 <span class="pill ready">พร้อม</span><span class="pill soon">เร็ว ๆ นี้</span></span>
-        <span class="t">แอปแรกของฉัน รันบนอุปกรณ์จำลอง</span>
-      </a>
-
-      <a class="wk soon" href="week02.html">
-        <span class="n">สัปดาห์ 2 <span class="pill ready">พร้อม</span><span class="pill soon">เร็ว ๆ นี้</span></span>
-        <span class="t">JavaScript สำหรับผู้ที่มาจาก C และ Java</span>
-      </a>
-
-      <a class="wk soon" href="week03.html">
-        <span class="n">สัปดาห์ 3 <span class="pill ready">พร้อม</span><span class="pill soon">เร็ว ๆ นี้</span></span>
-        <span class="t">การทำงานแบบอะซิงโครนัส Promise และ async/await</span>
-      </a>
-
-      <a class="wk soon" href="week04.html">
-        <span class="n">สัปดาห์ 4 <span class="pill ready">พร้อม</span><span class="pill soon">เร็ว ๆ นี้</span></span>
-        <span class="t">คอมโพเนนต์หลักและการจัดวาง UI</span>
-      </a>
-
-      <a class="wk soon" href="week05.html">
-        <span class="n">สัปดาห์ 5 <span class="pill ready">พร้อม</span><span class="pill soon">เร็ว ๆ นี้</span></span>
-        <span class="t">ส่วนต่อประสานผู้ใช้และระบบนำทาง</span>
-      </a>
-
-      <a class="wk soon" href="week06.html">
-        <span class="n">สัปดาห์ 6 <span class="pill ready">พร้อม</span><span class="pill soon">เร็ว ๆ นี้</span></span>
-        <span class="t">สถานะและวงจรชีวิตของคอมโพเนนต์</span>
-      </a>
-
-      <a class="wk soon" href="week07.html">
-        <span class="n">สัปดาห์ 7 <span class="pill ready">พร้อม</span><span class="pill soon">เร็ว ๆ นี้</span></span>
-        <span class="t">แบบฟอร์ม การตรวจความถูกต้อง และทบทวน</span>
-      </a>
-
-      <div class="wk soon">
-        <span class="n">สอบกลางภาค <span class="pill exam">ภาคปฏิบัติ</span></span>
-        <span class="t">3 ชั่วโมง ครอบคลุมสัปดาห์ 1–7</span>
-      </div>
-
-      <a class="wk soon" href="week08.html">
-        <span class="n">สัปดาห์ 8 <span class="pill ready">พร้อม</span><span class="pill soon">เร็ว ๆ นี้</span></span>
-        <span class="t">การเชื่อมต่อเครือข่าย Fetch API และ REST</span>
-      </a>
-
-      <a class="wk soon" href="week09.html">
-        <span class="n">สัปดาห์ 9 <span class="pill ready">พร้อม</span><span class="pill soon">เร็ว ๆ นี้</span></span>
-        <span class="t">ออกแบบฐานข้อมูลและ SQL ที่รันได้</span>
-      </a>
-
-      <a class="wk soon" href="week10.html">
-        <span class="n">สัปดาห์ 10 <span class="pill ready">พร้อม</span><span class="pill soon">เร็ว ๆ นี้</span></span>
-        <span class="t">ฐานข้อมูลในเครื่องด้วย expo-sqlite</span>
-      </a>
-
-      <a class="wk soon" href="week11.html">
-        <span class="n">สัปดาห์ 11 <span class="pill ready">พร้อม</span><span class="pill soon">เร็ว ๆ นี้</span></span>
-        <span class="t">ฐานข้อมูลบนคลาวด์และการเชื่อมต่อแบ็กเอนด์</span>
-      </a>
-
-      <a class="wk soon" href="week12.html">
-        <span class="n">สัปดาห์ 12 <span class="pill ready">พร้อม</span><span class="pill soon">เร็ว ๆ นี้</span></span>
-        <span class="t">ตำแหน่งทางภูมิศาสตร์และแผนที่</span>
-      </a>
-
-      <a class="wk soon" href="week13.html">
-        <span class="n">สัปดาห์ 13 <span class="pill ready">พร้อม</span><span class="pill soon">เร็ว ๆ นี้</span></span>
-        <span class="t">อากัปกิริยา ตัวรับรู้ และกล้อง</span>
-      </a>
-
-      <a class="wk soon" href="week14.html">
-        <span class="n">สัปดาห์ 14 <span class="pill ready">พร้อม</span><span class="pill soon">เร็ว ๆ นี้</span></span>
-        <span class="t">สื่อประสมและการแจ้งเตือนแบบพุช</span>
-      </a>
-
-      <a class="wk soon" href="week15.html">
-        <span class="n">สัปดาห์ 15 <span class="pill ready">พร้อม</span><span class="pill soon">เร็ว ๆ นี้</span></span>
-        <span class="t">เว็บบนมือถือ ข้อจำกัดอุปกรณ์ และ EAS Build</span>
-      </a>
-
-      <div class="wk soon">
-        <span class="n">สอบปลายภาค <span class="pill exam">ภาคปฏิบัติ</span></span>
-        <span class="t">3 ชั่วโมง เน้นสัปดาห์ 8–15</span>
-      </div>
+      <article class="wk" data-cat="พื้นฐาน" data-find="สัปดาห์ 1 แอปแรกของฉัน รันบนอุปกรณ์จำลอง EXPO พื้นฐาน expo emulator android studio create-expo-app vscode ติดตั้ง">
+        <div class="cover t-g"><span>EXPO</span></div>
+        <div class="body">
+          <p class="n">สัปดาห์ที่ 1<span class="pill ready">เปิดแล้ว</span><span class="pill soon">ยังไม่เปิด</span></p>
+          <h3 class="t">แอปแรกของฉัน รันบนอุปกรณ์จำลอง</h3>
+          <p class="by">อ.ดร.วรัทภพ ธภัทรสุวรรณ</p>
+          <p class="mats"><span class="mat">ใบแล็บ</span><span class="mat">โปรเจกต์ตั้งต้น</span></p>
+          <p class="foot"><span class="go">เข้าเรียน</span><span class="later">เปิดในคาบสัปดาห์ที่ 1</span><button type="button" class="done" data-done="w1">เรียนแล้ว</button></p>
+        </div>
+        <a class="hit" href="week01.html" aria-label="เข้าเรียนสัปดาห์ที่ 1 แอปแรกของฉัน รันบนอุปกรณ์จำลอง"></a>
+      </article>
+      <article class="wk soon" data-cat="พื้นฐาน" data-find="สัปดาห์ 2 JavaScript สำหรับผู้ที่มาจาก C และ Java JS พื้นฐาน javascript js array const reference equality">
+        <div class="cover t-a"><span>JS</span></div>
+        <div class="body">
+          <p class="n">สัปดาห์ที่ 2<span class="pill ready">เปิดแล้ว</span><span class="pill soon">ยังไม่เปิด</span></p>
+          <h3 class="t">JavaScript สำหรับผู้ที่มาจาก C และ Java</h3>
+          <p class="by">อ.ดร.วรัทภพ ธภัทรสุวรรณ</p>
+          <p class="mats"><span class="mat">สไลด์</span><span class="mat">ใบแล็บ</span><span class="mat">โปรเจกต์ตั้งต้น</span><span class="mat">กล่องทดลอง</span></p>
+          <p class="foot"><span class="go">เข้าเรียน</span><span class="later">เปิดในคาบสัปดาห์ที่ 2</span><button type="button" class="done" data-done="w2">เรียนแล้ว</button></p>
+        </div>
+        <a class="hit" href="week02.html" aria-label="เข้าเรียนสัปดาห์ที่ 2 JavaScript สำหรับผู้ที่มาจาก C และ Java"></a>
+      </article>
+      <article class="wk soon" data-cat="พื้นฐาน" data-find="สัปดาห์ 3 การทำงานแบบอะซิงโครนัส Promise และ async/await ASYNC พื้นฐาน async await promise asynchronous fetch รอ">
+        <div class="cover t-v"><span>ASYNC</span></div>
+        <div class="body">
+          <p class="n">สัปดาห์ที่ 3<span class="pill ready">เปิดแล้ว</span><span class="pill soon">ยังไม่เปิด</span></p>
+          <h3 class="t">การทำงานแบบอะซิงโครนัส Promise และ async/await</h3>
+          <p class="by">อ.ดร.วรัทภพ ธภัทรสุวรรณ</p>
+          <p class="mats"><span class="mat none">ยังไม่ได้ทำสื่อ</span></p>
+          <p class="foot"><span class="go">เข้าเรียน</span><span class="later">เปิดในคาบสัปดาห์ที่ 3</span><button type="button" class="done" data-done="w3">เรียนแล้ว</button></p>
+        </div>
+        <a class="hit" href="week03.html" aria-label="เข้าเรียนสัปดาห์ที่ 3 การทำงานแบบอะซิงโครนัส Promise และ async/await"></a>
+      </article>
+      <article class="wk soon" data-cat="ส่วนต่อประสาน" data-find="สัปดาห์ 4 คอมโพเนนต์หลักและการจัดวาง UI UI ส่วนต่อประสาน component view text flexbox layout styling">
+        <div class="cover t-c"><span>UI</span></div>
+        <div class="body">
+          <p class="n">สัปดาห์ที่ 4<span class="pill ready">เปิดแล้ว</span><span class="pill soon">ยังไม่เปิด</span></p>
+          <h3 class="t">คอมโพเนนต์หลักและการจัดวาง UI</h3>
+          <p class="by">อ.ดร.วรัทภพ ธภัทรสุวรรณ</p>
+          <p class="mats"><span class="mat none">ยังไม่ได้ทำสื่อ</span></p>
+          <p class="foot"><span class="go">เข้าเรียน</span><span class="later">เปิดในคาบสัปดาห์ที่ 4</span><button type="button" class="done" data-done="w4">เรียนแล้ว</button></p>
+        </div>
+        <a class="hit" href="week04.html" aria-label="เข้าเรียนสัปดาห์ที่ 4 คอมโพเนนต์หลักและการจัดวาง UI"></a>
+      </article>
+      <article class="wk soon" data-cat="ส่วนต่อประสาน" data-find="สัปดาห์ 5 ส่วนต่อประสานผู้ใช้และระบบนำทาง NAV ส่วนต่อประสาน navigation router stack tabs expo-router หน้าจอ">
+        <div class="cover t-c"><span>NAV</span></div>
+        <div class="body">
+          <p class="n">สัปดาห์ที่ 5<span class="pill ready">เปิดแล้ว</span><span class="pill soon">ยังไม่เปิด</span></p>
+          <h3 class="t">ส่วนต่อประสานผู้ใช้และระบบนำทาง</h3>
+          <p class="by">อ.ดร.วรัทภพ ธภัทรสุวรรณ</p>
+          <p class="mats"><span class="mat none">ยังไม่ได้ทำสื่อ</span></p>
+          <p class="foot"><span class="go">เข้าเรียน</span><span class="later">เปิดในคาบสัปดาห์ที่ 5</span><button type="button" class="done" data-done="w5">เรียนแล้ว</button></p>
+        </div>
+        <a class="hit" href="week05.html" aria-label="เข้าเรียนสัปดาห์ที่ 5 ส่วนต่อประสานผู้ใช้และระบบนำทาง"></a>
+      </article>
+      <article class="wk soon" data-cat="ส่วนต่อประสาน" data-find="สัปดาห์ 6 สถานะและวงจรชีวิตของคอมโพเนนต์ STATE ส่วนต่อประสาน state usestate useeffect hook lifecycle">
+        <div class="cover t-v"><span>STATE</span></div>
+        <div class="body">
+          <p class="n">สัปดาห์ที่ 6<span class="pill ready">เปิดแล้ว</span><span class="pill soon">ยังไม่เปิด</span></p>
+          <h3 class="t">สถานะและวงจรชีวิตของคอมโพเนนต์</h3>
+          <p class="by">อ.ดร.วรัทภพ ธภัทรสุวรรณ</p>
+          <p class="mats"><span class="mat none">ยังไม่ได้ทำสื่อ</span></p>
+          <p class="foot"><span class="go">เข้าเรียน</span><span class="later">เปิดในคาบสัปดาห์ที่ 6</span><button type="button" class="done" data-done="w6">เรียนแล้ว</button></p>
+        </div>
+        <a class="hit" href="week06.html" aria-label="เข้าเรียนสัปดาห์ที่ 6 สถานะและวงจรชีวิตของคอมโพเนนต์"></a>
+      </article>
+      <article class="wk soon" data-cat="ส่วนต่อประสาน" data-find="สัปดาห์ 7 แบบฟอร์ม การตรวจความถูกต้อง และทบทวน FORM ส่วนต่อประสาน form validation input ทบทวน review">
+        <div class="cover t-c"><span>FORM</span></div>
+        <div class="body">
+          <p class="n">สัปดาห์ที่ 7<span class="pill ready">เปิดแล้ว</span><span class="pill soon">ยังไม่เปิด</span></p>
+          <h3 class="t">แบบฟอร์ม การตรวจความถูกต้อง และทบทวน</h3>
+          <p class="by">อ.ดร.วรัทภพ ธภัทรสุวรรณ</p>
+          <p class="mats"><span class="mat none">ยังไม่ได้ทำสื่อ</span></p>
+          <p class="foot"><span class="go">เข้าเรียน</span><span class="later">เปิดในคาบสัปดาห์ที่ 7</span><button type="button" class="done" data-done="w7">เรียนแล้ว</button></p>
+        </div>
+        <a class="hit" href="week07.html" aria-label="เข้าเรียนสัปดาห์ที่ 7 แบบฟอร์ม การตรวจความถูกต้อง และทบทวน"></a>
+      </article>
+      <article class="wk soon ex" data-cat="สอบ" data-find="สอบกลางภาค ภาคปฏิบัติ 3 ชั่วโมง ครอบคลุมสัปดาห์ 1–7 สอบ">
+        <div class="cover t-x"><span>MID</span></div>
+        <div class="body">
+          <p class="n">สอบกลางภาค<span class="pill exam">ภาคปฏิบัติ</span></p>
+          <h3 class="t">ภาคปฏิบัติ 3 ชั่วโมง ครอบคลุมสัปดาห์ 1–7</h3>
+          <p class="by">อ.ดร.วรัทภพ ธภัทรสุวรรณ</p>
+          <p class="mats"><span class="mat none">ไม่มีสื่อเผยแพร่</span></p>
+          <p class="foot"><span class="go dim">ดูรายละเอียดที่ Google Classroom</span></p>
+        </div>
+      </article>
+      <article class="wk soon" data-cat="ข้อมูล" data-find="สัปดาห์ 8 การเชื่อมต่อเครือข่าย Fetch API และ REST HTTP ข้อมูล fetch api rest http json network เครือข่าย">
+        <div class="cover t-a"><span>HTTP</span></div>
+        <div class="body">
+          <p class="n">สัปดาห์ที่ 8<span class="pill ready">เปิดแล้ว</span><span class="pill soon">ยังไม่เปิด</span></p>
+          <h3 class="t">การเชื่อมต่อเครือข่าย Fetch API และ REST</h3>
+          <p class="by">อ.ดร.วรัทภพ ธภัทรสุวรรณ</p>
+          <p class="mats"><span class="mat none">ยังไม่ได้ทำสื่อ</span></p>
+          <p class="foot"><span class="go">เข้าเรียน</span><span class="later">เปิดในคาบสัปดาห์ที่ 8</span><button type="button" class="done" data-done="w8">เรียนแล้ว</button></p>
+        </div>
+        <a class="hit" href="week08.html" aria-label="เข้าเรียนสัปดาห์ที่ 8 การเชื่อมต่อเครือข่าย Fetch API และ REST"></a>
+      </article>
+      <article class="wk soon" data-cat="ข้อมูล" data-find="สัปดาห์ 9 ออกแบบฐานข้อมูลและ SQL ที่รันได้ SQL ข้อมูล sql database schema erd normalization ออกแบบ">
+        <div class="cover t-g"><span>SQL</span></div>
+        <div class="body">
+          <p class="n">สัปดาห์ที่ 9<span class="pill ready">เปิดแล้ว</span><span class="pill soon">ยังไม่เปิด</span></p>
+          <h3 class="t">ออกแบบฐานข้อมูลและ SQL ที่รันได้</h3>
+          <p class="by">อ.ดร.วรัทภพ ธภัทรสุวรรณ</p>
+          <p class="mats"><span class="mat none">ยังไม่ได้ทำสื่อ</span></p>
+          <p class="foot"><span class="go">เข้าเรียน</span><span class="later">เปิดในคาบสัปดาห์ที่ 9</span><button type="button" class="done" data-done="w9">เรียนแล้ว</button></p>
+        </div>
+        <a class="hit" href="week09.html" aria-label="เข้าเรียนสัปดาห์ที่ 9 ออกแบบฐานข้อมูลและ SQL ที่รันได้"></a>
+      </article>
+      <article class="wk soon" data-cat="ข้อมูล" data-find="สัปดาห์ 10 ฐานข้อมูลในเครื่องด้วย expo-sqlite SQLITE ข้อมูล sqlite expo-sqlite local database offline">
+        <div class="cover t-g"><span>SQLITE</span></div>
+        <div class="body">
+          <p class="n">สัปดาห์ที่ 10<span class="pill ready">เปิดแล้ว</span><span class="pill soon">ยังไม่เปิด</span></p>
+          <h3 class="t">ฐานข้อมูลในเครื่องด้วย expo-sqlite</h3>
+          <p class="by">อ.ดร.วรัทภพ ธภัทรสุวรรณ</p>
+          <p class="mats"><span class="mat none">ยังไม่ได้ทำสื่อ</span></p>
+          <p class="foot"><span class="go">เข้าเรียน</span><span class="later">เปิดในคาบสัปดาห์ที่ 10</span><button type="button" class="done" data-done="w10">เรียนแล้ว</button></p>
+        </div>
+        <a class="hit" href="week10.html" aria-label="เข้าเรียนสัปดาห์ที่ 10 ฐานข้อมูลในเครื่องด้วย expo-sqlite"></a>
+      </article>
+      <article class="wk soon" data-cat="ข้อมูล" data-find="สัปดาห์ 11 ฐานข้อมูลบนคลาวด์และการเชื่อมต่อแบ็กเอนด์ CLOUD ข้อมูล cloud backend supabase firebase api server">
+        <div class="cover t-c"><span>CLOUD</span></div>
+        <div class="body">
+          <p class="n">สัปดาห์ที่ 11<span class="pill ready">เปิดแล้ว</span><span class="pill soon">ยังไม่เปิด</span></p>
+          <h3 class="t">ฐานข้อมูลบนคลาวด์และการเชื่อมต่อแบ็กเอนด์</h3>
+          <p class="by">อ.ดร.วรัทภพ ธภัทรสุวรรณ</p>
+          <p class="mats"><span class="mat none">ยังไม่ได้ทำสื่อ</span></p>
+          <p class="foot"><span class="go">เข้าเรียน</span><span class="later">เปิดในคาบสัปดาห์ที่ 11</span><button type="button" class="done" data-done="w11">เรียนแล้ว</button></p>
+        </div>
+        <a class="hit" href="week11.html" aria-label="เข้าเรียนสัปดาห์ที่ 11 ฐานข้อมูลบนคลาวด์และการเชื่อมต่อแบ็กเอนด์"></a>
+      </article>
+      <article class="wk soon" data-cat="อุปกรณ์" data-find="สัปดาห์ 12 ตำแหน่งทางภูมิศาสตร์และแผนที่ MAP อุปกรณ์ map gps location geolocation maps แผนที่ พิกัด">
+        <div class="cover t-g"><span>MAP</span></div>
+        <div class="body">
+          <p class="n">สัปดาห์ที่ 12<span class="pill ready">เปิดแล้ว</span><span class="pill soon">ยังไม่เปิด</span></p>
+          <h3 class="t">ตำแหน่งทางภูมิศาสตร์และแผนที่</h3>
+          <p class="by">อ.ดร.วรัทภพ ธภัทรสุวรรณ</p>
+          <p class="mats"><span class="mat none">ยังไม่ได้ทำสื่อ</span></p>
+          <p class="foot"><span class="go">เข้าเรียน</span><span class="later">เปิดในคาบสัปดาห์ที่ 12</span><button type="button" class="done" data-done="w12">เรียนแล้ว</button></p>
+        </div>
+        <a class="hit" href="week12.html" aria-label="เข้าเรียนสัปดาห์ที่ 12 ตำแหน่งทางภูมิศาสตร์และแผนที่"></a>
+      </article>
+      <article class="wk soon" data-cat="อุปกรณ์" data-find="สัปดาห์ 13 อากัปกิริยา ตัวรับรู้ และกล้อง SENSOR อุปกรณ์ camera sensor accelerometer gesture กล้อง">
+        <div class="cover t-a"><span>SENSOR</span></div>
+        <div class="body">
+          <p class="n">สัปดาห์ที่ 13<span class="pill ready">เปิดแล้ว</span><span class="pill soon">ยังไม่เปิด</span></p>
+          <h3 class="t">อากัปกิริยา ตัวรับรู้ และกล้อง</h3>
+          <p class="by">อ.ดร.วรัทภพ ธภัทรสุวรรณ</p>
+          <p class="mats"><span class="mat none">ยังไม่ได้ทำสื่อ</span></p>
+          <p class="foot"><span class="go">เข้าเรียน</span><span class="later">เปิดในคาบสัปดาห์ที่ 13</span><button type="button" class="done" data-done="w13">เรียนแล้ว</button></p>
+        </div>
+        <a class="hit" href="week13.html" aria-label="เข้าเรียนสัปดาห์ที่ 13 อากัปกิริยา ตัวรับรู้ และกล้อง"></a>
+      </article>
+      <article class="wk soon" data-cat="อุปกรณ์" data-find="สัปดาห์ 14 สื่อประสมและการแจ้งเตือนแบบพุช MEDIA อุปกรณ์ media audio video push notification แจ้งเตือน">
+        <div class="cover t-v"><span>MEDIA</span></div>
+        <div class="body">
+          <p class="n">สัปดาห์ที่ 14<span class="pill ready">เปิดแล้ว</span><span class="pill soon">ยังไม่เปิด</span></p>
+          <h3 class="t">สื่อประสมและการแจ้งเตือนแบบพุช</h3>
+          <p class="by">อ.ดร.วรัทภพ ธภัทรสุวรรณ</p>
+          <p class="mats"><span class="mat none">ยังไม่ได้ทำสื่อ</span></p>
+          <p class="foot"><span class="go">เข้าเรียน</span><span class="later">เปิดในคาบสัปดาห์ที่ 14</span><button type="button" class="done" data-done="w14">เรียนแล้ว</button></p>
+        </div>
+        <a class="hit" href="week14.html" aria-label="เข้าเรียนสัปดาห์ที่ 14 สื่อประสมและการแจ้งเตือนแบบพุช"></a>
+      </article>
+      <article class="wk soon" data-cat="อุปกรณ์" data-find="สัปดาห์ 15 เว็บบนมือถือ ข้อจำกัดอุปกรณ์ และ EAS Build BUILD อุปกรณ์ eas build web responsive deploy apk">
+        <div class="cover t-a"><span>BUILD</span></div>
+        <div class="body">
+          <p class="n">สัปดาห์ที่ 15<span class="pill ready">เปิดแล้ว</span><span class="pill soon">ยังไม่เปิด</span></p>
+          <h3 class="t">เว็บบนมือถือ ข้อจำกัดอุปกรณ์ และ EAS Build</h3>
+          <p class="by">อ.ดร.วรัทภพ ธภัทรสุวรรณ</p>
+          <p class="mats"><span class="mat none">ยังไม่ได้ทำสื่อ</span></p>
+          <p class="foot"><span class="go">เข้าเรียน</span><span class="later">เปิดในคาบสัปดาห์ที่ 15</span><button type="button" class="done" data-done="w15">เรียนแล้ว</button></p>
+        </div>
+        <a class="hit" href="week15.html" aria-label="เข้าเรียนสัปดาห์ที่ 15 เว็บบนมือถือ ข้อจำกัดอุปกรณ์ และ EAS Build"></a>
+      </article>
+      <article class="wk soon ex" data-cat="สอบ" data-find="สอบปลายภาค ภาคปฏิบัติ 3 ชั่วโมง เน้นสัปดาห์ 8–15 สอบ">
+        <div class="cover t-x"><span>FINAL</span></div>
+        <div class="body">
+          <p class="n">สอบปลายภาค<span class="pill exam">ภาคปฏิบัติ</span></p>
+          <h3 class="t">ภาคปฏิบัติ 3 ชั่วโมง เน้นสัปดาห์ 8–15</h3>
+          <p class="by">อ.ดร.วรัทภพ ธภัทรสุวรรณ</p>
+          <p class="mats"><span class="mat none">ไม่มีสื่อเผยแพร่</span></p>
+          <p class="foot"><span class="go dim">ดูรายละเอียดที่ Google Classroom</span></p>
+        </div>
+      </article>
     </div>
+    <p class="empty" id="empty" hidden>ไม่พบหัวข้อที่ค้นหา ลองคำอื่นหรือกดหมวดทั้งหมด</p>
   </section>
 
   <section>
@@ -185,6 +426,7 @@ footer .wrap{padding-block:1.4rem 2.4rem;font-size:.85rem;color:var(--dim)}
     <div class="note">
       <p>ทุกสัปดาห์มีโปรเจกต์ตั้งต้นพร้อมตัวตรวจงาน สั่ง <code>npm run check</code> แล้วจะเห็นทันทีว่าข้อไหนผ่าน ข้อไหนยังไม่ผ่าน <strong>ชื่อของแต่ละเทสต์คือโจทย์ของข้อนั้น</strong> รันซ้ำได้ไม่จำกัดครั้ง คะแนนคิดจากจำนวนข้อที่ผ่านตอนปิดส่ง</p>
       <p>เก็บงานไว้ที่ไดรฟ์ D หรือ OneDrive ไม่ใช่ Desktop เพราะเครื่องในห้องบางตัวล้างโปรไฟล์ผู้ใช้ทุกครั้งที่ออกจากระบบ และถ้า <code>npm</code> บอกว่าสคริปต์ถูกปิดไว้ ให้เปลี่ยนจาก PowerShell ไปใช้ Command Prompt</p>
+      <p>ปุ่ม <strong>เรียนแล้ว</strong> บนการ์ดเป็นเครื่องหมายของตัวเอง เก็บไว้ในเบราว์เซอร์เครื่องนั้น ไม่ได้ส่งไปที่ไหนและไม่เกี่ยวกับคะแนน การส่งงานและคะแนนทั้งหมดอยู่ที่ Google Classroom</p>
     </div>
   </section>
 
@@ -196,6 +438,99 @@ footer .wrap{padding-block:1.4rem 2.4rem;font-size:.85rem;color:var(--dim)}
     ภาควิชาวิทยาการคำนวณและเทคโนโลยีดิจิทัล คณะศิลปศาสตร์และวิทยาศาสตร์ มหาวิทยาลัยเกษตรศาสตร์ วิทยาเขตกำแพงแสน
   </div>
 </footer>
+
+<script>
+(function () {
+  var grid  = document.getElementById('grid');
+  var cards = Array.prototype.slice.call(grid.querySelectorAll('.wk'));
+  var q     = document.getElementById('q');
+  var empty = document.getElementById('empty');
+  var countEl = document.getElementById('count');
+  var cat   = 'ทั้งหมด';
+
+  // ---- ปุ่มเริ่มเรียน ชี้ไปที่สัปดาห์แรกที่เปิดอยู่จริง ----
+  // อ่านจากคลาส soon ของการ์ด จึงไม่ต้องมาแก้ลิงก์นี้ซ้ำตอนเปิดสัปดาห์ใหม่
+  (function () {
+    var open = cards.filter(function (c) {
+      return !c.classList.contains('soon') && c.querySelector('.hit');
+    });
+    var cta = document.getElementById('cta');
+    var last = open[open.length - 1];
+    if (!last) { cta.hidden = true; return; }
+    var a = last.querySelector('.hit');
+    var n = last.querySelector('.n').textContent.replace(/[^0-9]/g, '');
+    cta.href = a.getAttribute('href');
+    cta.textContent = open.length > 1
+      ? 'เรียนต่อที่สัปดาห์ที่ ' + n
+      : 'เริ่มเรียนสัปดาห์ที่ ' + n;
+  })();
+
+  // ---- ค้นหาและกรองหมวด ----
+  function apply() {
+    var needle = q.value.trim().toLowerCase();
+    var shown = 0;
+    cards.forEach(function (c) {
+      var okCat = cat === 'ทั้งหมด' || c.dataset.cat === cat;
+      var okFind = !needle ||
+        (c.dataset.find + ' ' + c.querySelector('.t').textContent).toLowerCase().indexOf(needle) > -1;
+      var show = okCat && okFind;
+      c.hidden = !show;
+      if (show) shown++;
+    });
+    empty.hidden = shown > 0;
+  }
+
+  q.addEventListener('input', apply);
+
+  document.getElementById('cats').addEventListener('click', function (ev) {
+    var b = ev.target.closest('.cat');
+    if (!b) return;
+    cat = b.dataset.cat;
+    Array.prototype.forEach.call(this.querySelectorAll('.cat'), function (x) {
+      x.setAttribute('aria-pressed', String(x === b));
+    });
+    apply();
+  });
+
+  // ---- เครื่องหมายเรียนแล้ว เก็บในเบราว์เซอร์เครื่องนั้น ----
+  var KEY = 'w342done';
+
+  function load() {
+    try { return JSON.parse(window.localStorage.getItem(KEY) || '{}') || {}; }
+    catch (e) { return {}; }
+  }
+  function save(o) {
+    try { window.localStorage.setItem(KEY, JSON.stringify(o)); } catch (e) {}
+  }
+
+  var done = load();
+  var buttons = Array.prototype.slice.call(grid.querySelectorAll('.done'));
+
+  function tally() {
+    var open = cards.filter(function (c) { return !c.classList.contains('soon') && !c.classList.contains('ex'); }).length;
+    var n = buttons.filter(function (b) {
+      return !b.closest('.wk').classList.contains('soon') && done[b.dataset.done];
+    }).length;
+    countEl.innerHTML = open
+      ? 'เรียนแล้ว <b>' + n + '</b> จาก ' + open + ' สัปดาห์ที่เปิด'
+      : '';
+  }
+
+  buttons.forEach(function (b) {
+    b.setAttribute('aria-pressed', String(!!done[b.dataset.done]));
+    b.addEventListener('click', function () {
+      done[b.dataset.done] = !done[b.dataset.done];
+      if (!done[b.dataset.done]) delete done[b.dataset.done];
+      b.setAttribute('aria-pressed', String(!!done[b.dataset.done]));
+      save(done);
+      tally();
+    });
+  });
+
+  tally();
+  apply();
+})();
+</script>
 
 </body>
 </html>
