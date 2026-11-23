@@ -49,7 +49,11 @@ a.wk:hover{border-color:var(--cyan)}
 .wk .n{font-family:var(--font-mono);font-size:.76rem;color:var(--dim);
   display:flex;justify-content:space-between;gap:.6rem;align-items:baseline}
 .wk .t{font-weight:600;font-size:.97rem;line-height:1.45;margin-top:.15rem}
-.wk.soon{opacity:.52}
+/* เปิด/ปิดสัปดาห์: ใส่หรือเอาคำว่า soon ออกจาก class ของการ์ดนั้น คำเดียวจบ */
+.wk.soon{opacity:.5;pointer-events:none;cursor:default}
+.wk .pill.soon{display:none}
+.wk.soon .pill.ready{display:none}
+.wk.soon .pill.soon{display:inline}
 .pill{font-family:var(--font-ui);font-size:.68rem;font-weight:600;letter-spacing:.03em;
   border-radius:3px;padding:.05rem .4rem;flex:none}
 .pill.ready{color:var(--green);border:1px solid color-mix(in srgb,var(--green) 45%,transparent)}
@@ -90,90 +94,89 @@ footer .wrap{padding-block:1.4rem 2.4rem;font-size:.85rem;color:var(--dim)}
     <div class="weeks">
 
       <a class="wk" href="week01.html">
-        <span class="n">สัปดาห์ 1 <span class="pill ready">พร้อม</span></span>
+        <span class="n">สัปดาห์ 1 <span class="pill ready">พร้อม</span><span class="pill soon">เร็ว ๆ นี้</span></span>
         <span class="t">แอปแรกของฉัน รันบนอุปกรณ์จำลอง</span>
       </a>
 
-      <a class="wk" href="week02.html">
-        <span class="n">สัปดาห์ 2 <span class="pill ready">พร้อม</span></span>
+      <a class="wk soon" href="week02.html">
+        <span class="n">สัปดาห์ 2 <span class="pill ready">พร้อม</span><span class="pill soon">เร็ว ๆ นี้</span></span>
         <span class="t">JavaScript สำหรับผู้ที่มาจาก C และ Java</span>
       </a>
 
-      <div class="wk soon">
-        <span class="n">สัปดาห์ 3 <span class="pill soon">เร็ว ๆ นี้</span></span>
+      <a class="wk soon" href="week03.html">
+        <span class="n">สัปดาห์ 3 <span class="pill ready">พร้อม</span><span class="pill soon">เร็ว ๆ นี้</span></span>
         <span class="t">การทำงานแบบอะซิงโครนัส Promise และ async/await</span>
-      </div>
+      </a>
 
-      <div class="wk soon">
-        <span class="n">สัปดาห์ 4 <span class="pill soon">เร็ว ๆ นี้</span></span>
+      <a class="wk soon" href="week04.html">
+        <span class="n">สัปดาห์ 4 <span class="pill ready">พร้อม</span><span class="pill soon">เร็ว ๆ นี้</span></span>
         <span class="t">คอมโพเนนต์หลักและการจัดวาง UI</span>
-      </div>
+      </a>
 
-      <div class="wk soon">
-        <span class="n">สัปดาห์ 5 <span class="pill soon">เร็ว ๆ นี้</span></span>
+      <a class="wk soon" href="week05.html">
+        <span class="n">สัปดาห์ 5 <span class="pill ready">พร้อม</span><span class="pill soon">เร็ว ๆ นี้</span></span>
         <span class="t">ส่วนต่อประสานผู้ใช้และระบบนำทาง</span>
-      </div>
+      </a>
 
-      <div class="wk soon">
-        <span class="n">สัปดาห์ 6 <span class="pill soon">เร็ว ๆ นี้</span></span>
+      <a class="wk soon" href="week06.html">
+        <span class="n">สัปดาห์ 6 <span class="pill ready">พร้อม</span><span class="pill soon">เร็ว ๆ นี้</span></span>
         <span class="t">สถานะและวงจรชีวิตของคอมโพเนนต์</span>
-      </div>
+      </a>
 
-      <div class="wk soon">
-        <span class="n">สัปดาห์ 7 <span class="pill soon">เร็ว ๆ นี้</span></span>
+      <a class="wk soon" href="week07.html">
+        <span class="n">สัปดาห์ 7 <span class="pill ready">พร้อม</span><span class="pill soon">เร็ว ๆ นี้</span></span>
         <span class="t">แบบฟอร์ม การตรวจความถูกต้อง และทบทวน</span>
-      </div>
+      </a>
 
       <div class="wk soon">
         <span class="n">สอบกลางภาค <span class="pill exam">ภาคปฏิบัติ</span></span>
         <span class="t">3 ชั่วโมง ครอบคลุมสัปดาห์ 1–7</span>
       </div>
 
-      <div class="wk soon">
-        <span class="n">สัปดาห์ 8 <span class="pill soon">เร็ว ๆ นี้</span></span>
+      <a class="wk soon" href="week08.html">
+        <span class="n">สัปดาห์ 8 <span class="pill ready">พร้อม</span><span class="pill soon">เร็ว ๆ นี้</span></span>
         <span class="t">การเชื่อมต่อเครือข่าย Fetch API และ REST</span>
-      </div>
+      </a>
 
-      <div class="wk soon">
-        <span class="n">สัปดาห์ 9 <span class="pill soon">เร็ว ๆ นี้</span></span>
+      <a class="wk soon" href="week09.html">
+        <span class="n">สัปดาห์ 9 <span class="pill ready">พร้อม</span><span class="pill soon">เร็ว ๆ นี้</span></span>
         <span class="t">ออกแบบฐานข้อมูลและ SQL ที่รันได้</span>
-      </div>
+      </a>
 
-      <div class="wk soon">
-        <span class="n">สัปดาห์ 10 <span class="pill soon">เร็ว ๆ นี้</span></span>
+      <a class="wk soon" href="week10.html">
+        <span class="n">สัปดาห์ 10 <span class="pill ready">พร้อม</span><span class="pill soon">เร็ว ๆ นี้</span></span>
         <span class="t">ฐานข้อมูลในเครื่องด้วย expo-sqlite</span>
-      </div>
+      </a>
 
-      <div class="wk soon">
-        <span class="n">สัปดาห์ 11 <span class="pill soon">เร็ว ๆ นี้</span></span>
+      <a class="wk soon" href="week11.html">
+        <span class="n">สัปดาห์ 11 <span class="pill ready">พร้อม</span><span class="pill soon">เร็ว ๆ นี้</span></span>
         <span class="t">ฐานข้อมูลบนคลาวด์และการเชื่อมต่อแบ็กเอนด์</span>
-      </div>
+      </a>
 
-      <div class="wk soon">
-        <span class="n">สัปดาห์ 12 <span class="pill soon">เร็ว ๆ นี้</span></span>
+      <a class="wk soon" href="week12.html">
+        <span class="n">สัปดาห์ 12 <span class="pill ready">พร้อม</span><span class="pill soon">เร็ว ๆ นี้</span></span>
         <span class="t">ตำแหน่งทางภูมิศาสตร์และแผนที่</span>
-      </div>
+      </a>
 
-      <div class="wk soon">
-        <span class="n">สัปดาห์ 13 <span class="pill soon">เร็ว ๆ นี้</span></span>
+      <a class="wk soon" href="week13.html">
+        <span class="n">สัปดาห์ 13 <span class="pill ready">พร้อม</span><span class="pill soon">เร็ว ๆ นี้</span></span>
         <span class="t">อากัปกิริยา ตัวรับรู้ และกล้อง</span>
-      </div>
+      </a>
 
-      <div class="wk soon">
-        <span class="n">สัปดาห์ 14 <span class="pill soon">เร็ว ๆ นี้</span></span>
+      <a class="wk soon" href="week14.html">
+        <span class="n">สัปดาห์ 14 <span class="pill ready">พร้อม</span><span class="pill soon">เร็ว ๆ นี้</span></span>
         <span class="t">สื่อประสมและการแจ้งเตือนแบบพุช</span>
-      </div>
+      </a>
 
-      <div class="wk soon">
-        <span class="n">สัปดาห์ 15 <span class="pill soon">เร็ว ๆ นี้</span></span>
+      <a class="wk soon" href="week15.html">
+        <span class="n">สัปดาห์ 15 <span class="pill ready">พร้อม</span><span class="pill soon">เร็ว ๆ นี้</span></span>
         <span class="t">เว็บบนมือถือ ข้อจำกัดอุปกรณ์ และ EAS Build</span>
-      </div>
+      </a>
 
       <div class="wk soon">
         <span class="n">สอบปลายภาค <span class="pill exam">ภาคปฏิบัติ</span></span>
         <span class="t">3 ชั่วโมง เน้นสัปดาห์ 8–15</span>
       </div>
-
     </div>
   </section>
 

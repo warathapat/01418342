@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>บรรยายสัปดาห์ 2 ตัวแปรเก็บอะไร</title>
+<meta name="description" content="สไลด์บรรยายสัปดาห์ที่ 2 ของรายวิชา 01418342">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: เวที 16:9 หนึ่งสไลด์ต่อหน้าจอ เลื่อนด้วยลูกศร เนื้อหาไล่จากคำถามไปหาแบบจำลองแล้วกลับมาตอบทีละข้อ */
+:root{
+  --bg:#FBFAF7; --card:#FFFFFF; --ink:#16191D; --dim:#5C636E; --line:#DFDCD4;
+  --cyan:#0B7A96; --green:#1A7F37; --amber:#9A6412; --red:#B3261E;
+  --term-bg:#0D1117; --term-ink:#C9D1D9;
+  --font-ui:"IBM Plex Sans Thai",system-ui,"Segoe UI",sans-serif;
+  --font-mono:"IBM Plex Mono",ui-monospace,Consolas,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0D1117; --card:#161B22; --ink:#E6EDF3; --dim:#8B949E; --line:#263040;
+  --cyan:#61DAFB; --green:#3FB950; --amber:#F0A93B; --red:#FF7B72;
+  --term-bg:#010409; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0D1117; --card:#161B22; --ink:#E6EDF3; --dim:#8B949E; --line:#263040;
+  --cyan:#61DAFB; --green:#3FB950; --amber:#F0A93B; --red:#FF7B72;
+  --term-bg:#010409; color-scheme:dark}
+
+*{box-sizing:border-box}
+html,body{height:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font-ui);
+  line-height:1.6;-webkit-font-smoothing:antialiased;overflow:hidden}
+
+#stage{position:absolute;inset:0;display:grid;place-items:center;
+  padding-left:max(16px,env(safe-area-inset-left,0px));
+  padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:1rem}
+#deck{width:min(100%,calc((100vh - 5.5rem) * 16 / 9));aspect-ratio:16/9;
+  max-height:calc(100vh - 5.5rem);position:relative;container-type:size}
+.slide{position:absolute;inset:0;display:none;flex-direction:column;
+  padding:4.4cqh 5cqw;gap:2.6cqh;overflow:hidden}
+.slide.on{display:flex}
+
+h1{font-size:6.4cqh;line-height:1.22;margin:0;font-weight:700;text-wrap:balance;letter-spacing:-.01em}
+h2{font-size:5.1cqh;line-height:1.24;margin:0;font-weight:600;text-wrap:balance}
+.kicker{font-family:var(--font-mono);font-size:2.5cqh;letter-spacing:.1em;
+  text-transform:uppercase;color:var(--cyan);margin:0}
+p{margin:0;font-size:3.3cqh;max-width:52ch;color:var(--ink)}
+p.dim{color:var(--dim)}
+.big{font-size:4.2cqh;font-weight:500;text-wrap:balance;max-width:40ch}
+ul{margin:0;padding:0;list-style:none;display:grid;gap:1.9cqh}
+li{display:flex;gap:1.6cqw;align-items:flex-start;font-size:3.3cqh}
+li::before{content:"";flex:none;width:1.1cqh;height:1.1cqh;margin-top:1.25cqh;
+  border-radius:2px;background:var(--cyan)}
+li.q::before{background:var(--amber)}
+code{font-family:var(--font-mono);font-size:.9em;
+  background:color-mix(in srgb,var(--cyan) 14%,transparent);padding:.05em .3em;border-radius:3px}
+.mono{font-family:var(--font-mono)}
+.grow{flex:1;min-height:0;display:flex;flex-direction:column;justify-content:center;gap:2.2cqh}
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:3.4cqw;align-items:start}
+.cols.mid{align-items:center}
+
+pre{margin:0;background:var(--term-bg);color:var(--term-ink);border-radius:.9cqh;
+  font-family:var(--font-mono);font-size:2.75cqh;line-height:1.62;padding:2.2cqh 2cqw;
+  overflow:auto;border:1px solid var(--line);white-space:pre-wrap;word-break:break-word}
+pre .c{color:#7D8590}
+pre .ok{color:var(--green)}
+pre .bad{color:var(--red)}
+.out{min-height:9cqh}
+button{font-family:var(--font-ui);font-size:2.7cqh;font-weight:600;cursor:pointer;
+  border-radius:.7cqh;padding:.7cqh 1.6cqw;border:1px solid var(--cyan);
+  background:var(--cyan);color:var(--bg)}
+button:focus-visible{outline:.4cqh solid var(--amber);outline-offset:.3cqh}
+.runrow{display:flex;gap:1.4cqw;align-items:center;flex-wrap:wrap}
+.runrow .note{font-size:2.5cqh;color:var(--dim)}
+
+table{border-collapse:collapse;width:100%;font-size:2.9cqh}
+th,td{text-align:left;padding:1.2cqh 1.3cqw;border:1px solid var(--line);vertical-align:top}
+th{background:color-mix(in srgb,var(--cyan) 10%,transparent);font-weight:600}
+td.m,th.m{font-family:var(--font-mono);font-size:2.6cqh}
+.keep{color:var(--green);font-weight:600}
+.mut{color:var(--red);font-weight:600}
+
+.rule{border-left:.5cqh solid var(--amber);
+  background:color-mix(in srgb,var(--amber) 11%,transparent);
+  padding:1.8cqh 2cqw;border-radius:0 .7cqh .7cqh 0;font-size:3.2cqh}
+.rule b{color:var(--amber)}
+
+svg{max-width:100%;height:auto;display:block}
+
+#bar{position:absolute;left:0;right:0;bottom:0;display:flex;align-items:center;
+  gap:1rem;font-size:.82rem;color:var(--dim);
+  padding-left:max(16px,env(safe-area-inset-left,0px));
+  padding-right:max(16px,env(safe-area-inset-right,0px));
+  padding-bottom:calc(env(safe-area-inset-bottom,0px) + .6rem);padding-top:.6rem}
+#bar .who{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#bar .nav{margin-left:auto;display:flex;gap:.5rem;align-items:center;flex:none}
+#bar button{font-size:.8rem;padding:.2rem .6rem;border-radius:4px;
+  background:transparent;color:var(--dim);border:1px solid var(--line)}
+#bar button:hover{color:var(--ink)}
+#bar .count{font-family:var(--font-mono);font-variant-numeric:tabular-nums}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div id="stage"><div id="deck">
+
+<section class="slide on">
+  <p class="kicker">01418342 · สัปดาห์ 2</p>
+  <div class="grow">
+    <h1>ตัวแปรเก็บอะไร</h1>
+    <p class="big dim">JavaScript สำหรับผู้ที่มาจาก C และ Java</p>
+  </div>
+  <p class="dim" style="font-size:2.7cqh">สี่สิบห้านาทีนี้อธิบายสี่เรื่องที่เพิ่งเจอในกล่องทดลอง ด้วยแนวคิดเดียว</p>
+</section>
+
+<section class="slide">
+  <p class="kicker">เมื่อกี้เจออะไรมา</p>
+  <h2>สี่คำถามที่ยังไม่ได้ตอบ</h2>
+  <div class="grow">
+    <ul>
+      <li class="q"><code>push</code> คืนเลข <code>4</code> แทนที่จะคืนอาร์เรย์ และอาร์เรย์เดิมเปลี่ยนไปด้วย</li>
+      <li class="q">ออบเจกต์สองตัวที่ข้างในเหมือนกันทุกอย่าง เทียบแล้วได้ <code>false</code></li>
+      <li class="q">แก้ <code>จุดC</code> แล้ว <code>จุดA</code> เปลี่ยนตาม ทั้งที่ไม่ได้แตะ</li>
+      <li class="q"><code>const</code> แล้ว <code>push</code> ได้ แต่กำหนดค่าใหม่ไม่ได้</li>
+    </ul>
+  </div>
+  <p class="dim" style="font-size:2.7cqh">ทั้งสี่ข้อนี้มีคำตอบร่วมกันข้อเดียว</p>
+</section>
+
+<section class="slide">
+  <div class="grow">
+    <p class="kicker">แนวคิดเดียวที่อธิบายได้ทั้งหมด</p>
+    <h2>ใน C ตัวแปรคือกล่องที่มีค่าอยู่ข้างใน<br>ใน JavaScript บางกล่องเก็บแค่ที่อยู่</h2>
+  </div>
+</section>
+
+<section class="slide">
+  <p class="kicker">ภาษา C</p>
+  <h2>กำหนดค่า struct คือการคัดลอกทั้งก้อน</h2>
+  <div class="grow cols mid">
+    <pre><span class="c">// C</span>
+Point a = {1, 2};
+Point b = a;       <span class="c">// คัดลอก</span>
+b.x = 99;
+
+printf("%d", a.x); <span class="c">// 1</span></pre>
+    <svg viewBox="0 0 300 150" role="img" aria-label="กล่อง a และกล่อง b แยกกัน แต่ละกล่องมีค่าของตัวเอง">
+      <rect x="14" y="20" width="118" height="52" rx="6" fill="none" stroke="var(--line)" stroke-width="1.5"/>
+      <text x="73" y="14" text-anchor="middle" font-size="13" font-family="var(--font-mono)" fill="var(--dim)">a</text>
+      <text x="73" y="52" text-anchor="middle" font-size="15" font-family="var(--font-mono)" fill="var(--ink)">{1, 2}</text>
+      <rect x="168" y="20" width="118" height="52" rx="6" fill="none" stroke="var(--line)" stroke-width="1.5"/>
+      <text x="227" y="14" text-anchor="middle" font-size="13" font-family="var(--font-mono)" fill="var(--dim)">b</text>
+      <text x="227" y="52" text-anchor="middle" font-size="15" font-family="var(--font-mono)" fill="var(--ink)">{99, 2}</text>
+      <text x="150" y="112" text-anchor="middle" font-size="13" fill="var(--green)">สองกล่อง สองค่า ไม่เกี่ยวกัน</text>
+    </svg>
+  </div>
+</section>
+
+<section class="slide">
+  <p class="kicker">JavaScript</p>
+  <h2>ออบเจกต์ไม่ได้อยู่ในกล่อง กล่องเก็บแค่ลูกศร</h2>
+  <div class="grow cols mid">
+    <pre><span class="c">// JavaScript</span>
+const a = { x: 1, y: 2 };
+const b = a;       <span class="c">// คัดลอกลูกศร</span>
+b.x = 99;
+
+console.log(a.x);  <span class="c">// 99</span></pre>
+    <svg viewBox="0 0 300 165" role="img" aria-label="กล่อง a และกล่อง b ต่างเก็บลูกศรที่ชี้ไปยังออบเจกต์ก้อนเดียวกัน">
+      <rect x="10" y="16" width="86" height="40" rx="6" fill="none" stroke="var(--line)" stroke-width="1.5"/>
+      <text x="53" y="11" text-anchor="middle" font-size="13" font-family="var(--font-mono)" fill="var(--dim)">a</text>
+      <circle cx="53" cy="36" r="5" fill="var(--cyan)"/>
+      <rect x="10" y="92" width="86" height="40" rx="6" fill="none" stroke="var(--line)" stroke-width="1.5"/>
+      <text x="53" y="87" text-anchor="middle" font-size="13" font-family="var(--font-mono)" fill="var(--dim)">b</text>
+      <circle cx="53" cy="112" r="5" fill="var(--cyan)"/>
+      <rect x="186" y="50" width="104" height="48" rx="6" fill="color-mix(in srgb, var(--cyan) 14%, transparent)" stroke="var(--cyan)" stroke-width="2"/>
+      <text x="238" y="80" text-anchor="middle" font-size="15" font-family="var(--font-mono)" fill="var(--ink)">{x:99, y:2}</text>
+      <path d="M58 36 Q130 36 184 66" fill="none" stroke="var(--cyan)" stroke-width="1.8" marker-end="url(#ar)"/>
+      <path d="M58 112 Q130 112 184 86" fill="none" stroke="var(--cyan)" stroke-width="1.8" marker-end="url(#ar)"/>
+      <defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="var(--cyan)"/></marker></defs>
+      <text x="150" y="155" text-anchor="middle" font-size="13" fill="var(--amber)">สองกล่อง แต่ของมีก้อนเดียว</text>
+    </svg>
+  </div>
+</section>
+
+<section class="slide">
+  <p class="kicker">คำถามที่ 2 และ 3</p>
+  <h2>เทียบด้วย <span class="mono">===</span> คือเทียบว่าลูกศรชี้ที่เดียวกันไหม</h2>
+  <div class="grow">
+    <pre id="c1">const จุดA = { x: 1, y: 2 };
+const จุดB = { x: 1, y: 2 };   <span class="c">// คนละก้อน</span>
+const จุดC = จุดA;             <span class="c">// ก้อนเดียวกัน</span>
+
+console.log(จุดA === จุดB);
+console.log(จุดA === จุดC);</pre>
+    <div class="runrow">
+      <button data-run="1">รันดู</button>
+      <span class="note">ข้างในเหมือนกันไม่พอ ต้องเป็นก้อนเดียวกัน</span>
+    </div>
+    <pre class="out" id="o1"><span class="c">รอกดรัน</span></pre>
+  </div>
+</section>
+
+<section class="slide">
+  <p class="kicker">คำถามที่ 4</p>
+  <h2><span class="mono">const</span> ล็อกกล่อง ไม่ได้ล็อกของที่กล่องชี้ไป</h2>
+  <div class="grow">
+    <pre id="c2">const รายการ = ['ก', 'ข'];
+
+รายการ.push('ค');   <span class="c">// แก้ของที่ลูกศรชี้ไป ผ่าน</span>
+console.log(รายการ);
+
+try { รายการ = ['ง']; }  <span class="c">// เปลี่ยนลูกศร ไม่ผ่าน</span>
+catch (e) { console.log('error:', e.message); }</pre>
+    <div class="runrow"><button data-run="2">รันดู</button>
+      <span class="note">อยากล็อกของข้างในต้องใช้ <code>Object.freeze</code> ซึ่งคนละเรื่องกัน</span></div>
+    <pre class="out" id="o2"><span class="c">รอกดรัน</span></pre>
+  </div>
+</section>
+
+<section class="slide">
+  <p class="kicker">คำถามที่ 1</p>
+  <h2>เมธอดของอาร์เรย์มีสองพวก และปนกันไม่ได้</h2>
+  <div class="grow">
+    <table>
+      <thead><tr><th>แก้อาร์เรย์เดิม คืนค่าอื่น</th><th>ไม่แตะของเดิม คืนอาร์เรย์ใหม่</th></tr></thead>
+      <tbody>
+        <tr>
+          <td class="m"><span class="mut">push</span> · <span class="mut">pop</span> · <span class="mut">shift</span> · <span class="mut">unshift</span><br><span class="mut">splice</span> · <span class="mut">sort</span> · <span class="mut">reverse</span></td>
+          <td class="m"><span class="keep">concat</span> · <span class="keep">slice</span> · <span class="keep">map</span> · <span class="keep">filter</span><br><span class="keep">reduce</span> · <span class="keep">toSorted</span> · <span class="keep">toReversed</span></td>
+        </tr>
+        <tr>
+          <td><code>push</code> คืนความยาวใหม่ ไม่ใช่อาร์เรย์ จึงต่อ <code>.map()</code> ท้ายไม่ได้</td>
+          <td>ต่อกันเป็นลูกโซ่ได้ และของเดิมยังอยู่ครบ</td>
+        </tr>
+      </tbody>
+    </table>
+    <div class="rule"><b>ในแล็บนี้</b> ฟังก์ชันที่รับอาร์เรย์หรือออบเจกต์เข้ามา ห้ามแก้ของที่รับเข้ามา ให้คืนของใหม่เสมอ</div>
+  </div>
+</section>
+
+<section class="slide">
+  <p class="kicker">เรื่องที่ห้า ที่ยังไม่ได้ถาม</p>
+  <h2>มีตัวเปรียบเทียบสองตัว ตัวหนึ่งแปลงชนิดให้เงียบ ๆ</h2>
+  <div class="grow">
+    <pre id="c3">console.log("5 == '5'    ", 5 == '5');
+console.log("5 === '5'   ", 5 === '5');
+console.log("0 == ''     ", 0 == '');
+console.log("[] == false ", [] == false);</pre>
+    <div class="runrow"><button data-run="3">รันดู</button>
+      <span class="note">ใน C การเทียบ <code>int</code> กับ <code>char*</code> แบบนี้คอมไพเลอร์ฟ้องตั้งแต่แรก</span></div>
+    <pre class="out" id="o3"><span class="c">รอกดรัน</span></pre>
+  </div>
+</section>
+
+<section class="slide">
+  <div class="grow">
+    <p class="kicker">สรุปเป็นกฎใช้งาน</p>
+    <h2>สองข้อนี้พอสำหรับทั้งแล็บ</h2>
+    <ul>
+      <li>ฟังก์ชันที่รับอาร์เรย์หรือออบเจกต์เข้ามา ห้ามแก้ของที่รับเข้ามา — ใช้ <code>[...เดิม, ใหม่]</code> หรือ <code>concat</code> แทน <code>push</code></li>
+      <li>เปรียบเทียบด้วย <code>===</code> เสมอ — ถ้าจะเทียบออบเจกต์ว่าข้างในเหมือนกันไหม ต้องเทียบทีละฟิลด์เอง</li>
+    </ul>
+    <p class="dim">กฎสองข้อนี้อยู่หัวไฟล์ <code>src/bridge.js</code> แล้ว และชื่อเทสต์จะเตือนซ้ำเมื่อทำผิด</p>
+  </div>
+</section>
+
+<section class="slide">
+  <p class="kicker">แปลด้วยกันหนึ่งตัว</p>
+  <h2>จาก C ไป JavaScript</h2>
+  <div class="grow cols">
+    <div style="display:grid;gap:1.6cqh">
+      <p class="dim" style="font-size:2.6cqh">reference/original.c</p>
+      <pre><span class="c">/* นับคำ ช่องว่างติดกัน
+   นับเป็นตัวคั่นเดียว */</span>
+int countWords(const char *s) {
+  int count = 0, inWord = 0;
+  for (int i = 0; s[i]; i++) {
+    if (s[i] == ' ') inWord = 0;
+    else if (!inWord) {
+      inWord = 1; count++;
+    }
+  }
+  return count;
+}</pre>
+    </div>
+    <div style="display:grid;gap:1.6cqh">
+      <p class="dim" style="font-size:2.6cqh">src/bridge.js — เขียนสดในคาบ</p>
+      <pre>export function countWords(s) {
+
+  <span class="c">// ?</span>
+
+}</pre>
+      <div class="rule" style="font-size:2.8cqh">ถามก่อนเขียน: <b>สตริงว่าง</b> กับ <b>ช่องว่างล้วน</b> ต้องคืนอะไร</div>
+    </div>
+  </div>
+</section>
+
+<section class="slide">
+  <div class="grow">
+    <p class="kicker">ต่อจากนี้</p>
+    <h2>ไปทำปฏิบัติการที่ 2</h2>
+    <pre><span class="c">D:\mobile\lab02-js-bridge&gt;</span> npm run check
+
+  <span class="ok">✓</span> toCelsius แปลงอุณหภูมิได้ถูกต้องทั้งค่าบวกและค่าลบ
+  <span class="bad">✗</span> addItem ต้องไม่แก้อาร์เรย์เดิม แต่คืนอาร์เรย์ใหม่
+  <span class="c">… อีก 10 ข้อ</span></pre>
+    <p>ชื่อเทสต์คือโจทย์ รันซ้ำได้ไม่จำกัดครั้ง ติดตรงไหนยกมือ</p>
+  </div>
+</section>
+
+</div></div>
+
+<div id="bar">
+  <span class="who"><a href="../week02.html" style="color:var(--cyan)">&larr; สัปดาห์ 2</a> · บรรยาย ตัวแปรเก็บอะไร</span>
+  <span class="nav">
+    <button id="prev" aria-label="สไลด์ก่อนหน้า">←</button>
+    <span class="count"><span id="cur">1</span> / <span id="tot">12</span></span>
+    <button id="next" aria-label="สไลด์ถัดไป">→</button>
+  </span>
+</div>
+
+<script>
+(function () {
+  var slides = Array.prototype.slice.call(document.querySelectorAll('.slide'));
+  var i = 0;
+  document.getElementById('tot').textContent = slides.length;
+
+  function go(n) {
+    i = Math.max(0, Math.min(slides.length - 1, n));
+    slides.forEach(function (s, k) { s.classList.toggle('on', k === i); });
+    document.getElementById('cur').textContent = i + 1;
+    try { location.hash = 's' + (i + 1); } catch (e) {}
+  }
+
+  document.getElementById('next').addEventListener('click', function () { go(i + 1); });
+  document.getElementById('prev').addEventListener('click', function () { go(i - 1); });
+
+  document.addEventListener('keydown', function (e) {
+    if (e.target && /^(TEXTAREA|INPUT)$/.test(e.target.tagName)) return;
+    if (e.key === 'ArrowRight' || e.key === 'PageDown' || e.key === ' ') { e.preventDefault(); go(i + 1); }
+    else if (e.key === 'ArrowLeft' || e.key === 'PageUp') { e.preventDefault(); go(i - 1); }
+    else if (e.key === 'Home') { e.preventDefault(); go(0); }
+    else if (e.key === 'End') { e.preventDefault(); go(slides.length - 1); }
+  });
+
+  // โค้ดของแต่ละกล่องรัน โดยอ่านจาก <pre> ที่คู่กัน
+  function show(v) {
+    if (typeof v === 'string') return v;
+    if (v === undefined) return 'undefined';
+    if (v === null) return 'null';
+    if (Array.isArray(v)) return '[' + v.map(show).join(', ') + ']';
+    if (typeof v === 'object') { try { return JSON.stringify(v); } catch (e) { return String(v); } }
+    return String(v);
+  }
+  function esc(s) {
+    return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  }
+  document.addEventListener('click', function (ev) {
+    var b = ev.target.closest('button[data-run]');
+    if (!b) return;
+    var n = b.dataset.run;
+    var src = document.getElementById('c' + n).textContent;
+    var out = document.getElementById('o' + n);
+    var lines = [];
+    var fake = { log: function () { lines.push(Array.prototype.map.call(arguments, show).join(' ')); } };
+    fake.info = fake.warn = fake.error = fake.log;
+    try {
+      new Function('console', '"use strict";\n' + src)(fake);
+      out.innerHTML = lines.length
+        ? lines.map(function (l) { return '<span class="ok">▸</span> ' + esc(l); }).join('\n')
+        : '<span class="c">ไม่มี console.log ให้แสดง</span>';
+    } catch (e) {
+      out.innerHTML = lines.map(function (l) { return '<span class="ok">▸</span> ' + esc(l); })
+        .concat('<span class="bad">✗ ' + esc(e.name + ': ' + e.message) + '</span>').join('\n');
+    }
+  });
+
+  var m = /^#s(\d+)$/.exec(location.hash || '');
+  go(m ? Number(m[1]) - 1 : 0);
+  window.addEventListener('hashchange', function () {
+    var h = /^#s(\d+)$/.exec(location.hash || '');
+    if (h && Number(h[1]) - 1 !== i) go(Number(h[1]) - 1);
+  });
+})();
+</script>
+</body>
+</html>
