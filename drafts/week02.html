@@ -123,6 +123,17 @@ th{background:color-mix(in srgb,var(--cyan) 9%,transparent);font-weight:600;font
 footer{border-top:1px solid var(--line);margin-top:1rem;padding-top:1.2rem;
   font-size:.84rem;color:var(--dim)}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+
+/* ช่องเดาก่อนรัน  ปุ่มรันจะปลดล็อกเมื่อช่องนี้มีข้อความ */
+.guess{border-top:1px dashed var(--line);padding:.7rem .9rem .25rem}
+.guess label{display:block;font-size:.8rem;font-weight:600;color:var(--amber);margin-bottom:.4rem}
+.guess label .why{font-weight:400;color:var(--dim)}
+.snip .gbox{min-height:4.4rem;font-family:var(--font-ui);font-size:.86rem;line-height:1.6;
+  padding:.5rem .6rem;border:1px solid var(--line);border-radius:6px;background:var(--bg)}
+.snip .gbox:focus{outline:2px solid var(--amber);outline-offset:-2px}
+.snip .gbox::placeholder{color:var(--dim)}
+button[disabled],button[disabled]:hover{opacity:.42;cursor:not-allowed;filter:none}
+.out .gm{color:var(--amber)}
 </style>
 </head>
 <body>
@@ -162,7 +173,7 @@ footer{border-top:1px solid var(--line);margin-top:1rem;padding-top:1.2rem;
 
   <section>
     <h2><span class="num">02</span>ลองรันดูก่อน</h2>
-    <p>สี่กล่องนี้คือสี่เรื่องที่ทำให้คนจาก C และ Java พลาดบ่อยที่สุด แก้โค้ดในกล่องได้ตามใจ แล้วกดรันดูผล ทุกอย่างทำงานในเบราว์เซอร์ ไม่ต้องติดตั้งอะไร</p>
+    <p>สี่กล่องนี้คือสี่เรื่องที่ทำให้คนจาก C และ Java พลาดบ่อยที่สุด <strong>อ่านโค้ดแล้วเขียนผลลัพธ์ที่คิดว่าจะได้ลงช่องสีเหลืองก่อน</strong> ปุ่มรันจะกดได้เมื่อเขียนแล้ว เขียนเสร็จกดรันเทียบได้เลย ที่ต้องเขียนก่อนไม่ใช่เพราะเป็นกฎ แต่เพราะถ้าเห็นคำตอบก่อน สมองจะบอกตัวเองว่ารู้อยู่แล้ว ทั้งที่ยังไม่รู้ ข้อที่เดาไม่ตรงคือข้อที่ได้ความรู้ใหม่กลับไป ทุกอย่างทำงานในเบราว์เซอร์ ไม่ต้องติดตั้งอะไร และไม่มีการส่งข้อมูลไปที่ไหน</p>
 
     <div class="runner">
 
@@ -177,8 +188,12 @@ const ข = เดิม.concat([5]);  // concat คืนอะไร
 console.log('push คืน  ', ก);
 console.log('concat คืน', ข);
 console.log('อาร์เรย์เดิมตอนนี้', เดิม);</textarea>
-        <div class="bar">
-          <button data-run="s1">รัน</button>
+                <div class="guess">
+          <label for="g1">เดาก่อน แล้วปุ่มรันจะปลดล็อก <span class="why">— เขียนผลของ console.log ทั้งสามบรรทัด</span></label>
+          <textarea id="g1" class="gbox" rows="3" spellcheck="false" placeholder="เดาเลย ผิดได้ ไม่มีใครเห็น ไม่ได้ส่งไปที่ไหน"></textarea>
+        </div>
+<div class="bar">
+          <button data-run="s1" disabled>รัน</button>
           <button class="ghost" data-reset="s1">คืนค่าเดิม</button>
           <span class="hint">สังเกตบรรทัดสุดท้าย อาร์เรย์เดิมยังเป็น [1,2,3] อยู่ไหม</span>
         </div>
@@ -193,8 +208,12 @@ console.log("5 === '5'  ", 5 === '5');
 console.log("0 == ''    ", 0 == '');
 console.log("null == 0  ", null == 0);
 console.log("[] == false", [] == false);</textarea>
-        <div class="bar">
-          <button data-run="s2">รัน</button>
+                <div class="guess">
+          <label for="g2">เดาก่อน แล้วปุ่มรันจะปลดล็อก <span class="why">— เขียน true หรือ false ทั้งห้าบรรทัด</span></label>
+          <textarea id="g2" class="gbox" rows="3" spellcheck="false" placeholder="เดาเลย ผิดได้ ไม่มีใครเห็น ไม่ได้ส่งไปที่ไหน"></textarea>
+        </div>
+<div class="bar">
+          <button data-run="s2" disabled>รัน</button>
           <button class="ghost" data-reset="s2">คืนค่าเดิม</button>
           <span class="hint">ใน C การเทียบ int กับ char* แบบนี้คอมไพเลอร์ฟ้องตั้งแต่แรก</span>
         </div>
@@ -213,8 +232,12 @@ console.log('A === C', จุดA === จุดC);
 
 จุดC.x = 99;
 console.log('แก้ C แล้ว A เป็น', จุดA);</textarea>
-        <div class="bar">
-          <button data-run="s3">รัน</button>
+                <div class="guess">
+          <label for="g3">เดาก่อน แล้วปุ่มรันจะปลดล็อก <span class="why">— เขียนผลทั้งสามบรรทัด บรรทัดสุดท้ายเขียนค่าของจุด A ออกมาทั้งตัว</span></label>
+          <textarea id="g3" class="gbox" rows="3" spellcheck="false" placeholder="เดาเลย ผิดได้ ไม่มีใครเห็น ไม่ได้ส่งไปที่ไหน"></textarea>
+        </div>
+<div class="bar">
+          <button data-run="s3" disabled>รัน</button>
           <button class="ghost" data-reset="s3">คืนค่าเดิม</button>
           <span class="hint">เทียบกับ struct ใน C ที่คัดลอกค่าให้ตอนกำหนดค่า</span>
         </div>
@@ -234,8 +257,12 @@ try {
 } catch (e) {
   console.log('error:', e.message);
 }</textarea>
-        <div class="bar">
-          <button data-run="s4">รัน</button>
+                <div class="guess">
+          <label for="g4">เดาก่อน แล้วปุ่มรันจะปลดล็อก <span class="why">— เขียนผลทั้งสองบรรทัด ถ้าคิดว่าจะมี error ให้เดาด้วยว่าข้อความว่าอะไร</span></label>
+          <textarea id="g4" class="gbox" rows="3" spellcheck="false" placeholder="เดาเลย ผิดได้ ไม่มีใครเห็น ไม่ได้ส่งไปที่ไหน"></textarea>
+        </div>
+<div class="bar">
+          <button data-run="s4" disabled>รัน</button>
           <button class="ghost" data-reset="s4">คืนค่าเดิม</button>
           <span class="hint">const ล็อกตัวแปร ไม่ได้ล็อกสิ่งที่ตัวแปรชี้ไป</span>
         </div>
@@ -321,6 +348,12 @@ try {
   function run(id) {
     var src = document.getElementById(id).value;
     var out = document.getElementById('o' + id.slice(1));
+    var gEl = document.getElementById('g' + id.slice(1));
+    var guess = gEl ? gEl.value.trim() : '';
+    var head = guess
+      ? '<span class="gm">ที่เดาไว้</span>\n' + esc(guess) +
+        '\n\n<span class="gm">ผลจริง</span>\n'
+      : '';
     var lines = [];
     var fake = {
       log: function () {
@@ -330,14 +363,57 @@ try {
     fake.info = fake.warn = fake.error = fake.log;
     try {
       new Function('console', '"use strict";\n' + src)(fake);
-      out.innerHTML = lines.length
+      out.innerHTML = head + (lines.length
         ? lines.map(function (l) { return '<span class="ok">▸</span> ' + esc(l); }).join('\n')
-        : '<span class="note">รันผ่านแล้ว แต่ไม่มี console.log ให้แสดง</span>';
+        : '<span class="note">รันผ่านแล้ว แต่ไม่มี console.log ให้แสดง</span>');
     } catch (e) {
-      out.innerHTML = lines.map(function (l) { return '<span class="ok">▸</span> ' + esc(l); })
+      out.innerHTML = head + lines.map(function (l) { return '<span class="ok">▸</span> ' + esc(l); })
         .concat('<span class="bad">✗ ' + esc(e.name + ': ' + e.message) + '</span>').join('\n');
     }
   }
+
+  // ---- ยืดช่องข้อความให้พอดีกับเนื้อหา ----
+  // กล่องโค้ดของบางข้อยาวกว่าความสูงตั้งต้น ถ้าไม่ยืดจะตัดบรรทัดสุดท้ายหาย
+  function grow(el) {
+    el.style.height = 'auto';
+    el.style.height = (el.scrollHeight + 2) + 'px';
+  }
+
+  function autoGrow(el) {
+    if (!el) return;
+    grow(el);
+    el.addEventListener('input', function () { grow(el); });
+  }
+
+  // ---- ประตูเดาก่อนรัน ----
+  // ปุ่มรันของกล่องไหนจะกดได้ เมื่อช่องเดาของกล่องนั้นมีข้อความ
+  var KEY = 'w2guess:';
+
+  function store(id, v) {
+    try { window.localStorage.setItem(KEY + id, v); } catch (e) {}
+  }
+  function recall(id) {
+    try { return window.localStorage.getItem(KEY + id) || ''; } catch (e) { return ''; }
+  }
+
+  function sync(id) {
+    var g = document.getElementById('g' + id.slice(1));
+    var b = document.querySelector('button[data-run="' + id + '"]');
+    if (!g || !b) return;
+    var ready = g.value.trim().length > 0;
+    b.disabled = !ready;
+    b.title = ready ? '' : 'เขียนคำตอบที่เดาลงช่องด้านบนก่อน';
+  }
+
+  ['s1','s2','s3','s4'].forEach(function (id) {
+    autoGrow(document.getElementById(id));
+    var g = document.getElementById('g' + id.slice(1));
+    if (!g) return;
+    g.value = recall(id);              // กันเผลอรีเฟรชหน้ากลางคาบ
+    grow(g);
+    sync(id);
+    g.addEventListener('input', function () { grow(g); store(id, g.value); sync(id); });
+  });
 
   document.addEventListener('click', function (ev) {
     var b = ev.target.closest('button');
@@ -346,6 +422,7 @@ try {
     if (b.dataset.reset) {
       var id = b.dataset.reset;
       document.getElementById(id).value = original[id];
+      grow(document.getElementById(id));
       document.getElementById('o' + id.slice(1)).innerHTML =
         '<span class="note">กดปุ่มรันเพื่อดูผล</span>';
     }
