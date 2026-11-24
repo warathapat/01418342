@@ -162,21 +162,22 @@ footer{border-top:1px solid var(--line);margin-top:1rem;padding-top:1.2rem;
 
   <section>
     <h2><span class="num">02</span>ก่อนเริ่ม ตรวจเครื่องก่อน</h2>
-    <p>ดาวน์โหลดชุดเครื่องมือด้านล่าง แตกไฟล์ไว้ที่ไดรฟ์ D แล้วดับเบิลคลิก <code>1-CHECK-PC.bat</code> ต้องผ่านครบ 6 ข้อก่อนทำขั้นต่อไป ข้อที่ไม่ผ่านตัวโปรแกรมจะบอกวิธีแก้ให้เอง</p>
+    <p>ดาวน์โหลดชุดเครื่องมือด้านล่าง แตกไฟล์ไว้ที่ไดรฟ์ D แล้วดับเบิลคลิก <code>1-CHECK-PC.bat</code> ต้องผ่านครบ 5 ข้อก่อนทำขั้นต่อไป ข้อที่ไม่ผ่านตัวโปรแกรมจะบอกวิธีแก้ให้เอง ให้แก้จากข้อบนลงล่าง เพราะถ้าข้อ Android SDK ไม่ผ่าน สองข้อถัดไปจะยังตรวจไม่ได้</p>
+    <p>หน้าต่างสีดำของ Command Prompt แสดงภาษาไทยไม่ได้ บนหน้าต่างจึงขึ้นสรุปเป็นภาษาอังกฤษ แล้ว Notepad จะเปิดผลเต็มภาษาไทยพร้อมวิธีแก้ขึ้นมาให้เอง ถ้ารันในเทอร์มินัลของ VS Code ด้วยคำสั่ง <code>npm run check-env</code> จะเห็นภาษาไทยในเทอร์มินัลเลย</p>
     <div class="term" role="img" aria-label="ตัวอย่างผลการตรวจความพร้อมของเครื่อง">
 <span class="c">D:\mobile\lab01-first-app&gt;</span> npm run check-env
 
   ปฏิบัติการที่ 1  —  ตรวจความพร้อมของเครื่อง
 
-  <span class="ok">✓</span> Node.js เวอร์ชัน 22.11.0
-  <span class="ok">✓</span> npm เวอร์ชัน 10.9.0
-  <span class="ok">✓</span> พบ Java
-  <span class="ok">✓</span> พบ Android SDK
-  <span class="ok">✓</span> เรียก adb ได้
-  <span class="bad">✗</span> ยังไม่มี AVD
-      ทางแก้: เปิด Android Studio ไปที่ Device Manager แล้วสร้างอุปกรณ์จำลองเป็นมือถือ เช่น Pixel 7
+  <span class="ok">✓</span> Node.js เวอร์ชัน 22.12.0
+  <span class="ok">✓</span> npm เวอร์ชัน 10.9.2
+  <span class="ok">✓</span> พบ Android SDK ที่ C:\Users\b67xxxxxxxx\AppData\Local\Android\Sdk
+  <span class="ok">✓</span> พบ adb
+  <span class="bad">✗</span> ยังไม่มีอุปกรณ์จำลอง (AVD)
+      ทางแก้: เปิด Android Studio ไปที่ Device Manager
+              สร้างอุปกรณ์จำลองแบบมือถือ เช่น Pixel 7
 
-  ผ่าน 5 จาก 6 ข้อ</div>
+  ผ่าน 4 จาก 5 ข้อ</div>
   </section>
 
   <section>

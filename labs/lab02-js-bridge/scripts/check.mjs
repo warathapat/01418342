@@ -1,14 +1,21 @@
 // ตัวตรวจงานของปฏิบัติการที่ 2  —  นิสิตไม่ต้องแก้ไฟล์นี้
 import { pathToFileURL } from 'node:url';
 import { resolve } from 'node:path';
+import { report } from './report.mjs';
 
 const SRC = resolve(process.cwd(), 'src/bridge.js');
 let M;
 try {
   M = await import(pathToFileURL(SRC).href);
 } catch (e) {
-  console.error('\n  เปิดไฟล์ src/bridge.js ไม่ได้ ภาษาอาจผิดไวยากรณ์\n');
-  console.error('  ' + String(e.message).split('\n')[0] + '\n');
+  const msg = String(e.message).split('\n')[0];
+  report({
+    title: 'ปฏิบัติการที่ 2  —  เปิดไฟล์ src/bridge.js ไม่ได้',
+    titleEn: 'Lab 2 - cannot load src/bridge.js',
+    rows: [{ ok: false, name: 'ไฟล์ src/bridge.js ผิดไวยากรณ์ ยังไม่มีเทสต์ข้อไหนได้รัน',
+             en: 'syntax error in src/bridge.js: ' + msg,
+             hint: 'อ่านข้อความด้านล่างแล้วไปแก้บรรทัดที่มันชี้\n' + msg }],
+  });
   process.exit(1);
 }
 
@@ -58,17 +65,22 @@ const CASES = [
 ];
 
 let pass = 0;
-const lines = [];
-for (const [name, run] of CASES) {
+const rows = [];
+CASES.forEach(([name, run], i) => {
   let ok = false, note = '';
   try { ok = run() === true; }
   catch (e) { note = '  (' + String(e.message).split('\n')[0].slice(0, 60) + ')'; }
   if (ok) pass++;
-  lines.push(`  ${ok ? '✓' : '✗'} ${name}${ok ? '' : note}`);
-}
+  // ป้ายอังกฤษใช้ชื่อฟังก์ชันที่อยู่ต้นชื่อเทสต์ เผื่อหน้าต่างแสดงไทยไม่ได้
+  rows.push({ ok, name: name + (ok ? '' : note), en: `test ${i + 1}: ${name.split(' ')[0]}${ok ? '' : note}` });
+});
 
-console.log('\n  ปฏิบัติการที่ 2  —  JavaScript สำหรับผู้ที่มาจาก C และ Java\n');
-console.log(lines.join('\n'));
 const score = (pass / CASES.length) * 2.0;
-console.log(`\n  ผ่าน ${pass} จาก ${CASES.length} ข้อ   คะแนนส่วนนี้ ${score.toFixed(2)} จาก 2.00\n`);
+report({
+  title: 'ปฏิบัติการที่ 2  —  JavaScript สำหรับผู้ที่มาจาก C และ Java',
+  titleEn: 'Lab 2 - JavaScript for C and Java programmers',
+  rows,
+  footer: [`ผ่าน ${pass} จาก ${CASES.length} ข้อ   คะแนนส่วนนี้ ${score.toFixed(2)} จาก 2.00`],
+  footerEn: [`Passed ${pass} of ${CASES.length}   score ${score.toFixed(2)} / 2.00`],
+});
 process.exit(pass === CASES.length ? 0 : 1);
